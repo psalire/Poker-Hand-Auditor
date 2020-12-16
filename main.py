@@ -26,9 +26,9 @@ def print_results(title, label, expected, sample, std_dev=2, label_column_size=1
     full_width = label_column_size + value_column_size*columns + columns*3
     horizontal_divider = ('{:-^%d}' % full_width).format('')
 
-    label_row = '{:^%d} | {:^%d} | {:^%d} | {:^%d} | {:^%d} | {:^%d}' % ((label_column_size,) + tuple(value_column_size for _ in range(5)))
-    results_row = '{:^%d} | {:^%d} | {:^%d} | {:^%d} | {:^%d} | {:^%d}' % ((label_column_size,) + tuple(value_column_size for _ in range(5)))
-    totals_row = '{:^%d} | {:^%df} | {:^%df} | {:^%df} | {:^%df} | {:^%d}' % ((label_column_size,) + tuple(value_column_size for _ in range(5)))
+    # Format string based on number of columns
+    results_row = ('{:^%d} | '%label_column_size) + ''.join(['{:^%d} | '%value_column_size for _ in range(columns-1)]) + '{:^%d}'%value_column_size
+    totals_row = ('{:^%d} | '%label_column_size) + ''.join(['{:^%df} | '%value_column_size for _ in range(columns-1)]) + '{:^%d}'%value_column_size
     column_value = '{:^%df}' % (value_column_size)
 
     sample_size = sum(sample.values())
@@ -37,7 +37,7 @@ def print_results(title, label, expected, sample, std_dev=2, label_column_size=1
     print(horizontal_divider)
     print(('{:^%d}' % full_width).format('{}, {}% Confidence Limit, n={}'.format(title, confidence_limit, sample_size)))
     print(horizontal_divider)
-    print(label_row.format(label, 'Expected', 'Sample', 'Lower', 'Upper', 'Size'))
+    print(results_row.format(label, 'Expected', 'Sample', 'Lower', 'Upper', 'Size'))
     print(horizontal_divider)
     sums = [0 for _ in range(5)]
     for key in sample:
