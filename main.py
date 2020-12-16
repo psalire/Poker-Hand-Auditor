@@ -26,9 +26,11 @@ def print_results(title, label, expected, sample, std_dev=2, label_column_size=1
     full_width = label_column_size + value_column_size*columns + columns*3
     horizontal_divider = ('{:-^%d}' % full_width).format('')
 
-    # Format string based on number of columns
-    results_row = ('{:^%d} | '%label_column_size) + ''.join(['{:^%d} | '%value_column_size for _ in range(columns-1)]) + '{:^%d}'%value_column_size
-    totals_row = ('{:^%d} | '%label_column_size) + ''.join(['{:^%df} | '%value_column_size for _ in range(columns-1)]) + '{:^%d}'%value_column_size
+    # Format string based on number and size of columns
+    label_column = '{:^%d} | '%label_column_size
+    sample_size_column = '{:^%d}'%value_column_size
+    results_row = label_column + ''.join(['{:^%d} | '%value_column_size for _ in range(columns-1)]) + sample_size_column
+    totals_row = label_column + ''.join(['{:^%df} | '%value_column_size for _ in range(columns-1)]) + sample_size_column
     column_value = '{:^%df}' % (value_column_size)
 
     sample_size = sum(sample.values())
