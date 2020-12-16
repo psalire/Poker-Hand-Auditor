@@ -1,5 +1,5 @@
 
-# Poker Hand Auditor
+# Poker Hand Auditor (with Confidence Intervals)
 
 Calculate proportion of card draws and hands compared to the expected values with confidence limits. These are the same methods as shown in iTechlabs' [example audit report](https://itechlabs.com/certification-services/rtprng-audits/), which is the leader in RNG audits for casinos.
 
