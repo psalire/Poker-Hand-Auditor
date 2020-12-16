@@ -41,18 +41,21 @@ class Bovada:
         '^Board \[((?:%s ){1,3} |(?:%s ){4}|(?:%s ){4}(?:%s))\]$' % (_re_card, _re_card, _re_card, _re_card)
     )
 
+    ## file: str, filename including path
     def __init__(self, file):
         self.open_new_file(file)
     def __del__(self):
         if self.file:
             self.file.close()
 
+    ## file: str, filename including path
     def open_new_file(self, file):
         if hasattr(self, 'file') and self.file:
             self.file.close()
         self.file = open(file, 'r')
 
     # Move cursor to first re match, returns empty string on EOF
+    ## regex: regular expression to match
     def _move_cursor_to_re(self, regex):
         l = self.file.readline()
         while not regex.match(l) and l:
@@ -60,7 +63,7 @@ class Bovada:
         return l
 
     # Returns next hole cards as a list of tuples and moves cursor to location
-    # only_me : only count my ([ME]) hole cards
+    ## only_me : bool, only count my ([ME]) hole cards
     def get_hole_cards(self, only_me=False):
         # Find Hole Cards header
         if not self._move_cursor_to_re(self.RE_STAGE['Hole Cards']):

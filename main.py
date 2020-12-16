@@ -22,6 +22,15 @@ CARDS = [
     'Ac','Ad','Ah','As',
 ]
 
+# Print table of results
+## title: str, title of the table
+## label: str, label of the first column
+## expected: dict, expected values
+## sample: dict, sampled values
+## std_dev: int 1,2,3, std_dev for use in confidence limit
+## label_column_size: width of first column
+## value_column_size: width of other columns
+## columns: number of columns to read from parameters expected and sample
 def print_results(title, label, expected, sample, std_dev=2, label_column_size=18, value_column_size=12, columns=5):
     full_width = label_column_size + value_column_size*columns + columns*3
     horizontal_divider = ('{:-^%d}' % full_width).format('')
