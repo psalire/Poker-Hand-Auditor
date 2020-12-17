@@ -32,7 +32,8 @@ CARDS = [
 ## label_column_size: width of first column
 ## value_column_size: width of other columns
 ## columns: number of columns to read from parameters expected and sample
-def print_results(title, label, expected, sample, std_dev=2, label_column_size=18, value_column_size=12, columns=5):
+def print_results(title, label, expected, sample, std_dev=2, label_column_size=18, value_column_size=12, is_normal=True):
+    columns = 5 if is_normal else 3
     full_width = label_column_size + value_column_size*columns + columns*3
     horizontal_divider = ('{:-^%d}' % full_width).format('')
 
@@ -44,14 +45,19 @@ def print_results(title, label, expected, sample, std_dev=2, label_column_size=1
     column_value = '{:^%df}' % (value_column_size)
 
     sample_size = sum(sample.values())
-    confidence_limit = ['68', '95', '99.7'][std_dev-1]
 
+    print('\n',horizontal_divider)
+    if is_normal:
+        confidence_limit = ['68', '95', '99.7'][std_dev-1]
+        print(('{:^%d}' % full_width).format('{}, {}% Confidence Limit, n={}'.format(title, confidence_limit, sample_size)))
+        print(horizontal_divider)
+        print(results_row.format(label, 'Expected', 'Sample', 'Lower', 'Upper', 'Size'))
+    else:
+        print(('{:^%d}' % full_width).format('{}, n={}'.format(title, sample_size)))
+        print(horizontal_divider)
+        print(results_row.format(label, 'Expected', 'Sample', 'Size'))
     print(horizontal_divider)
-    print(('{:^%d}' % full_width).format('{}, {}% Confidence Limit, n={}'.format(title, confidence_limit, sample_size)))
-    print(horizontal_divider)
-    print(results_row.format(label, 'Expected', 'Sample', 'Lower', 'Upper', 'Size'))
-    print(horizontal_divider)
-    sums = [0 for _ in range(5)]
+    sums = [0 for _ in range(columns)]
     for key in sample:
         sample_percentage = sample[key]/sample_size
         # e.append(sample_percentage)
@@ -59,35 +65,50 @@ def print_results(title, label, expected, sample, std_dev=2, label_column_size=1
 
         # Calculate standard error
         ## can't divide by zero
-        if sample[key] != 0:
-            standard_error = sqrt((expected[key] * (1-expected[key])) / sample[key])
-            lower_percentage = expected[key] - std_dev*standard_error
-            upper_percentage = expected[key] + std_dev*standard_error
-        else:
-            standard_error = None
-            lower_percentage = None
-            upper_percentage = None
+        if is_normal:
+            if sample[key] != 0:
+                standard_error = sqrt((expected[key] * (1-expected[key])) / sample[key])
+                lower_percentage = expected[key] - std_dev*standard_error
+                upper_percentage = expected[key] + std_dev*standard_error
+            else:
+                standard_error = None
+                lower_percentage = None
+                upper_percentage = None
 
-        print(results_row.format(
-                key,
-                column_value.format(expected[key]),
-                *(
-                    # If value is None, do str(None), else print the float value
-                    (column_value.format(x) if x != None else str(x)
-                        for x in [sample_percentage, lower_percentage, upper_percentage])
-                ),
-                sample[key],
+            print(results_row.format(
+                    key,
+                    *(
+                        # If value is None, do str(None), else print the float value
+                        (column_value.format(x) if x != None else str(x)
+                            for x in [expected[key], sample_percentage, lower_percentage, upper_percentage])
+                    ),
+                    sample[key],
+                )
             )
-        )
+        else:
+            print(results_row.format(
+                    key,
+                    *(
+                        # If value is None, do str(None), else print the float value
+                        (column_value.format(x) if x != None else str(x)
+                            for x in [expected[key], sample_percentage])
+                    ),
+                    sample[key],
+                )
+            )
         sums[0] += expected[key]
-        if standard_error:
+        if is_normal:
+            if standard_error:
+                sums[1] += sample_percentage
+                sums[2] += lower_percentage
+                sums[3] += upper_percentage
+            sums[4] += sample[key]
+        else:
             sums[1] += sample_percentage
-            sums[2] += lower_percentage
-            sums[3] += upper_percentage
-        sums[4] += sample[key]
+            sums[2] += sample[key]
     print(horizontal_divider)
     print(totals_row.format('Sum', *(sum for sum in sums)))
-    assert sample_size == sums[4] # Sanity check for sample size
+    assert sample_size == sums[4 if is_normal else 2] # Sanity check for sample size
 
 # Helper function for counting hole cards
 ## hole_cards: tuple, pair of hole cards
@@ -182,14 +203,15 @@ def main():
         'Hand',
         hand_probabilites,
         hand_frequency,
-        std_dev=args.stdev
+        std_dev=args.stdev,
     )
     print_results(
         'Distribution of Cards',
         'Card',
         {x: 1/len(CARDS) for x in CARDS},
         card_frequency,
-        std_dev=args.stdev
+        std_dev=args.stdev,
+        is_normal=False
     )
     if args.holecards:
         print_results(
@@ -197,7 +219,8 @@ def main():
             'Hole Cards',
             {x: 1/len(hole_card_frequency) for x in hole_card_frequency.keys()},
             hole_card_frequency,
-            std_dev=args.stdev
+            std_dev=args.stdev,
+            is_normal=False,
         )
     if args.holecardsnosuits:
         print_results(
@@ -205,7 +228,8 @@ def main():
             'Hole Cards',
             {x: 1/len(hole_card_nosuits_frequency) for x in hole_card_nosuits_frequency.keys()},
             hole_card_nosuits_frequency,
-            std_dev=args.stdev
+            std_dev=args.stdev,
+            is_normal=False,
         )
 
 if __name__ == '__main__':
