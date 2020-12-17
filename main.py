@@ -46,7 +46,7 @@ def print_results(title, label, expected, sample, std_dev=2, label_column_size=1
 
     sample_size = sum(sample.values())
 
-    print('\n',horizontal_divider)
+    print('\n'+horizontal_divider)
     if is_normal:
         confidence_limit = ['68', '95', '99.7'][std_dev-1]
         print(('{:^%d}' % full_width).format('{}, {}% Confidence Limit, n={}'.format(title, confidence_limit, sample_size)))
@@ -213,24 +213,30 @@ def main():
         std_dev=args.stdev,
         is_normal=False
     )
-    # if args.holecards:
-    #     print_results(
-    #         'Distribution of Hole Cards with suits',
-    #         'Hole Cards',
-    #         {x: 1/len(hole_card_frequency) for x in hole_card_frequency.keys()},
-    #         hole_card_frequency,
-    #         std_dev=args.stdev,
-    #         is_normal=False,
-    #     )
-    # if args.holecardsnosuits:
-    #     print_results(
-    #         'Distribution of Hole Cards without suits',
-    #         'Hole Cards',
-    #         {x: 1/len(hole_card_nosuits_frequency) for x in hole_card_nosuits_frequency.keys()},
-    #         hole_card_nosuits_frequency,
-    #         std_dev=args.stdev,
-    #         is_normal=False,
-    #     )
+    if args.holecards:
+        hole_card_combinations = [' '.join(x) for x in combinations(CARDS, 2)]
+        hole_card_expected_frequency = {x: hole_card_combinations.count(x) / len(hole_card_combinations) for x in hole_card_combinations}
+
+        print_results(
+            'Distribution of Hole Cards with suits',
+            'Hole Cards',
+            hole_card_expected_frequency,
+            hole_card_frequency,
+            std_dev=args.stdev,
+            is_normal=False,
+        )
+    if args.holecardsnosuits:
+        hole_card_nosuit_combinations = [' '.join((x[0], y[0])) for x, y in combinations(CARDS, 2)]
+        hole_card_nosuits_expected_frequency = {x: hole_card_nosuit_combinations.count(x) / len(hole_card_nosuit_combinations) for x in hole_card_nosuit_combinations}
+
+        print_results(
+            'Distribution of Hole Cards without suits',
+            'Hole Cards',
+            hole_card_nosuits_expected_frequency,
+            hole_card_nosuits_frequency,
+            std_dev=args.stdev,
+            is_normal=False,
+        )
 
 if __name__ == '__main__':
     main()
