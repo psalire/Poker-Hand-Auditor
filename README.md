@@ -9,7 +9,7 @@ iTechlabs also uses Marsaglia's "diehard" tests which are not covered in this sc
 
 ## How it works
 
-It parses hand history files for hole cards and board cards while counting every drawn card, and all combinations of 5-card hands and their ranks (e.g. pair, straight, etc.) between the hole cards and board cards. etc. Final output is two tables of the found sample proportions and upper and lower confidence limits, one for card frequency and one for hand frequency.
+It parses hand history files for hole cards and board cards while counting every drawn card, and all combinations of 5-card hands and their ranks (e.g. pair, straight, etc.) between the hole cards and board cards. etc. Optionally, also count hole card pairs. Final output is tables of the found sample proportions with upper and lower confidence limits.
 
 ## Prerequisites
 
