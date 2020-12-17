@@ -239,4 +239,6 @@ optional arguments:
 
 ## Interpreting Results
 
-Above in the sample output, it was found the "high card" and "pair" sample values were not within the lower and upper values of the 99.7% confidence interval. The high card sample value was below the lower, and the pair sample value was above the upper. This means these sample values fall within 0.3% of the expected outcomes given the current sample size, which is extremely unusual but not completely impossible. More samples are needed to reach a conclusion.
+Above in the sample output, it was found the "high card" and "pair" sample values were not within the lower and upper values of the 99.7% confidence interval. The high card sample value was below the lower, and the pair sample value was above the upper. This means these that sample values fall within 0.3% of the expected outcomes given the current sample size, which is extremely unusual but not completely impossible. More samples are needed to reach a conclusion.
+
+All other outputs including seem reasonable.
