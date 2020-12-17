@@ -45,7 +45,6 @@ def print_results(title, label, expected, sample, std_dev=2, label_column_size=1
 
     sample_size = sum(sample.values())
     confidence_limit = ['68', '95', '99.7'][std_dev-1]
-    z_value = {'68': 1, '95': 1.96, '99.7': 2.97}
 
     print(horizontal_divider)
     print(('{:^%d}' % full_width).format('{}, {}% Confidence Limit, n={}'.format(title, confidence_limit, sample_size)))
@@ -61,7 +60,7 @@ def print_results(title, label, expected, sample, std_dev=2, label_column_size=1
         # Calculate standard error
         ## can't divide by zero
         if sample[key] != 0:
-            standard_error = z_value[confidence_limit]*sqrt((expected[key] * (1-expected[key])) / sample[key])
+            standard_error = sqrt((expected[key] * (1-expected[key])) / sample[key])
             lower_percentage = expected[key] - std_dev*standard_error
             upper_percentage = expected[key] + std_dev*standard_error
         else:
