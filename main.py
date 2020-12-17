@@ -213,24 +213,24 @@ def main():
         std_dev=args.stdev,
         is_normal=False
     )
-    if args.holecards:
-        print_results(
-            'Distribution of Hole Cards with suits',
-            'Hole Cards',
-            {x: 1/len(hole_card_frequency) for x in hole_card_frequency.keys()},
-            hole_card_frequency,
-            std_dev=args.stdev,
-            is_normal=False,
-        )
-    if args.holecardsnosuits:
-        print_results(
-            'Distribution of Hole Cards without suits',
-            'Hole Cards',
-            {x: 1/len(hole_card_nosuits_frequency) for x in hole_card_nosuits_frequency.keys()},
-            hole_card_nosuits_frequency,
-            std_dev=args.stdev,
-            is_normal=False,
-        )
+    # if args.holecards:
+    #     print_results(
+    #         'Distribution of Hole Cards with suits',
+    #         'Hole Cards',
+    #         {x: 1/len(hole_card_frequency) for x in hole_card_frequency.keys()},
+    #         hole_card_frequency,
+    #         std_dev=args.stdev,
+    #         is_normal=False,
+    #     )
+    # if args.holecardsnosuits:
+    #     print_results(
+    #         'Distribution of Hole Cards without suits',
+    #         'Hole Cards',
+    #         {x: 1/len(hole_card_nosuits_frequency) for x in hole_card_nosuits_frequency.keys()},
+    #         hole_card_nosuits_frequency,
+    #         std_dev=args.stdev,
+    #         is_normal=False,
+    #     )
 
 if __name__ == '__main__':
     main()
