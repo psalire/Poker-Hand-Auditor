@@ -4,6 +4,7 @@ import argparse
 import Parse
 from treys import Card, Evaluator
 from itertools import combinations
+# from scipy.stats import chisquare
 from math import sqrt
 
 CARDS = [
@@ -44,6 +45,7 @@ def print_results(title, label, expected, sample, std_dev=2, label_column_size=1
 
     sample_size = sum(sample.values())
     confidence_limit = ['68', '95', '99.7'][std_dev-1]
+    z_value = {'68': 1, '95': 1.96, '99.7': 2.97}
 
     print(horizontal_divider)
     print(('{:^%d}' % full_width).format('{}, {}% Confidence Limit, n={}'.format(title, confidence_limit, sample_size)))
@@ -53,11 +55,13 @@ def print_results(title, label, expected, sample, std_dev=2, label_column_size=1
     sums = [0 for _ in range(5)]
     for key in sample:
         sample_percentage = sample[key]/sample_size
+        e.append(sample_percentage)
+        z.append(expected[key])
 
         # Calculate standard error
         ## can't divide by zero
         if sample[key] != 0:
-            standard_error = sqrt((expected[key] * (1-expected[key])) / sample[key])
+            standard_error = z_value[confidence_limit]*sqrt((expected[key] * (1-expected[key])) / sample[key])
             lower_percentage = expected[key] - std_dev*standard_error
             upper_percentage = expected[key] + std_dev*standard_error
         else:
@@ -86,11 +90,23 @@ def print_results(title, label, expected, sample, std_dev=2, label_column_size=1
     print(totals_row.format('Sum', *(sum for sum in sums)))
     assert sample_size == sums[4] # Sanity check for sample size
 
+# Helper function for counting hole cards
+## hole_cards: tuple, pair of hole cards
+## frequency_dict: dict, dict for counting cards
+def count_hole_cards_frequency(hole_cards, frequency_dict):
+    k = ' '.join(hole_cards)
+    # If key doesn't exist, then must be in opposite order
+    if k not in frequency_dict:
+        k = ' '.join(hole_cards[::-1]) # Reverse order of cards in key
+    frequency_dict[k] += 1
+
 def main():
     # Argparse
     argparser = argparse.ArgumentParser(description='Poker Hand Auditor')
     argparser.add_argument('path', type=str, help='Path to hand history directory')
     argparser.add_argument('--onlyme', action='store_true', help='Only count my hands')
+    argparser.add_argument('--holecards', action='store_true', help='Show table for frequency of hole cards with suits (Long output)')
+    argparser.add_argument('--holecardsnosuits', action='store_true', help='Show table for frequency of hole cards without suits')
     argparser.add_argument('--stdev', choices=[1,2,3], default=2, type=int,
                             help='Stdev for confidence limit, so 1 for 68%%, 2 for 95%%, and 3 for 99.7%%. Default=2')
     argparser.add_argument('--site', choices=['Bovada'], default='Bovada', type=str,
@@ -104,6 +120,11 @@ def main():
     hand_probabilites = Parse.HAND_PROBABILITIES
     card_frequency = {x: 0 for x in CARDS}
     hand_frequency = {x: 0 for x in hand_probabilites.keys()}
+    if args.holecards:
+        hole_card_frequency = {' '.join(x): 0 for x in combinations(CARDS, 2)}
+    if args.holecardsnosuits:
+        hole_card_nosuits_frequency = {' '.join(x): 0 for x in combinations([c[0] for c in CARDS], 2)} # Remove suit from cards
+
     # Treys evaluator
     evaluator = Evaluator()
 
@@ -123,8 +144,14 @@ def main():
 
             # Count card frequency of hole cards
             for c_1, c_2 in hole_cards:
+                # Individual card frequency
                 card_frequency[c_1] += 1
                 card_frequency[c_2] += 1
+                # Frequency of hole cards as a pair
+                if args.holecards:
+                    count_hole_cards_frequency((c_1,c_2), hole_card_frequency)
+                if args.holecardsnosuits:
+                    count_hole_cards_frequency([x[0] for x in (c_1,c_2)], hole_card_nosuits_frequency)
 
             # Get board cards
             board = b.get_summary_board()
@@ -165,6 +192,22 @@ def main():
         card_frequency,
         std_dev=args.stdev
     )
+    if args.holecards:
+        print_results(
+            'Distribution of Hole Cards with suits',
+            'Hole Cards',
+            {x: 1/len(hole_card_frequency) for x in hole_card_frequency.keys()},
+            hole_card_frequency,
+            std_dev=args.stdev
+        )
+    if args.holecardsnosuits:
+        print_results(
+            'Distribution of Hole Cards without suits',
+            'Hole Cards',
+            {x: 1/len(hole_card_nosuits_frequency) for x in hole_card_nosuits_frequency.keys()},
+            hole_card_nosuits_frequency,
+            std_dev=args.stdev
+        )
 
 if __name__ == '__main__':
     main()
