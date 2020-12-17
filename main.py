@@ -55,8 +55,8 @@ def print_results(title, label, expected, sample, std_dev=2, label_column_size=1
     sums = [0 for _ in range(5)]
     for key in sample:
         sample_percentage = sample[key]/sample_size
-        e.append(sample_percentage)
-        z.append(expected[key])
+        # e.append(sample_percentage)
+        # z.append(expected[key])
 
         # Calculate standard error
         ## can't divide by zero
