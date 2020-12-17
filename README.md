@@ -239,8 +239,6 @@ optional arguments:
 
 ## Interpreting Results
 
-The sample proportion should generally be within the lower and upper values.
+Above in the sample output, it was found the "high card" and "pair" sample values were not within the lower and upper values of the 99.7% confidence interval. The high card sample value was below the lower, and the pair sample value was above the upper. This means these sample values fall within 0.3% of the expected outcomes given the current sample size, which is extremely unusual but not completely impossible. More samples are needed to reach a conclusion.
 
-Above in the sample output, it was found the high card and pair sample values were not within the lower and upper values of the 99.7% confidence interval. The high card sample value was below the lower, and the pair sample value was above the upper. This means these sample values fall within 0.3% of the expected outcomes given the current sample size, which is extremely unusual but not completely impossible. More samples are needed to reach a conclusion.
-
-More importantly, it's observable that the distribution of hole card pairs is not uniform as expected. It is very evident by a glance that some hole cards are significantly distributed less than others. More tests will added for testing this.
+More notably however, it's observable that the distribution of hole card pairs is not uniform as expected. It is very evident that some hole cards are significantly distributed less than others. More tests will added for testing this.
