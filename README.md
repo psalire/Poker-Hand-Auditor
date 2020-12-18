@@ -13,7 +13,7 @@ Proportion of poker hands:
 |------------|-----------|-------|----------|-------|----------|-------|------------|--------|----------------|
 | Proportion | 0.501     | 0.423 | 0.048    | 0.021 | 0.004    | 0.002 | 0.001      | 0.0002 | 0.00003        |
 
-A good, genuine RNG will produce this proportion of poker hands given a significantly large sample size. Smaller sample sizes should fit within a reasonable confidence interval. In addition, the proportion of individual cards and hole cards together (not counting suits) should be uniform distributions.
+A good, genuine RNG will produce these proportions given a significantly large sample size. Smaller sample sizes should fit within a reasonable confidence interval. In addition, the proportion of individual cards and hole cards together (not counting suits) should be uniform distributions.
 
 This script parses hand history files for hole and board cards and counts every drawn card, and all 5-card hands and their ranks (e.g. pair, straight, etc.). Optionally, also counts the hole card distribution and/or the distribution of all hand combinations of hole and board cards.
 
@@ -22,8 +22,9 @@ Final output is tables of the sample proportions compared to the expected with u
 ## Prerequisites
 
 - Python 3 (3.9.1)
-- treys (`python -m pip install treys`) - [A poker hand evaluation library](https://github.com/ihendley/treys)
-- scipy - ([Installation directions](https://scipy.org/install.html))
+- treys - [A poker hand evaluation library](https://github.com/ihendley/treys)
+- scipy - For chi-square tests
+    - [Installation directions](https://scipy.org/install.html)
 
 ## Files
 
