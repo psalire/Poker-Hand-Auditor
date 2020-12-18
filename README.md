@@ -1,13 +1,13 @@
 
 # Poker Hand Auditor (with Confidence Intervals)
 
-This script calculates proportion of card draws and hands compared to the expected values in confidence intervals. These are the same methods as shown in iTechlabs' [example audit report](https://itechlabs.com/certification-services/rtprng-audits/), which is one of the leaders in RNG audits for casinos.
+This script calculates proportion of card draws and hands compared to the expected values, their confidence intervals, and chi-square p-values. These are some of the same methods as shown in iTechlabs' [example audit report](https://itechlabs.com/certification-services/rtprng-audits/), which is one of the leaders in RNG audits for casinos.
 
-iTechlabs also uses Marsaglia's "diehard" tests which are not covered in this script.
+iTechlabs also uses Marsaglia's "diehard" tests which are not covered in this script but worth looking into.
 
 ## How it works
 
-It parses hand history files for hole and board cards while counting every drawn card, and all 5-card hands and their ranks (e.g. pair, straight, etc.). Optionally, also count the hole card distribution and/or the distribution of all hand combinations of hole and board cards. Final output is tables of the found sample proportions compared to the expected with upper and lower confidence limits.
+It parses hand history files for hole and board cards while counting every drawn card, and all 5-card hands and their ranks (e.g. pair, straight, etc.). Optionally, also count the hole card distribution and/or the distribution of all hand combinations of hole and board cards. Final output is tables of the found sample proportions compared to the expected with upper and lower confidence limits and chi-square goodness of fit test results.
 
 ## Prerequisites
 
@@ -60,10 +60,9 @@ optional arguments:
 ### Sample output
 
 ```
-> python main.py "C:\Users\psalire\Bovada.lv Poker\Hand History\012345678910" --stdev 3 --holecards
 
 ---------------------------------------------------------------------------------------------------------------
-                            Distribution of Hands, 99.7% Confidence Limit, n=44365                             |
+                                         Distribution of Hands, n=99.7                                         |
 ---------------------------------------------------------------------------------------------------------------
      Hand      |   Expected    | Expected Size |    Sample     |     Lower     |     Upper     |  Sample Size  |
 ---------------------------------------------------------------------------------------------------------------
@@ -79,9 +78,14 @@ straight flush |   0.000015    |       1       |   0.000203    |   -0.003914   |
 ---------------------------------------------------------------------------------------------------------------
      Total     |   0.999999    |     44365     |   1.000000    |   0.934446    |   1.065552    |     44365     |
 ---------------------------------------------------------------------------------------------------------------
+                                    Chi-Square Goodness of Fit Test Results                                    |
+---------------------------------------------------------------------------------------------------------------
+                      Chi-square                       |                     41198.402441                      |
+                        p-value                        |                       0.000000                        |
+---------------------------------------------------------------------------------------------------------------
 
 ---------------------------------------------------------------------------------------------------------------
-                    Distribution of All Hand Combinations, 99.7% Confidence Limit, n=579070                    |
+                                 Distribution of All Hand Combinations, n=99.7                                 |
 ---------------------------------------------------------------------------------------------------------------
      Hand      |   Expected    | Expected Size |    Sample     |     Lower     |     Upper     |  Sample Size  |
 ---------------------------------------------------------------------------------------------------------------
@@ -96,6 +100,11 @@ four of a kind |   0.000240    |      139      |   0.000266    |   -0.003505   |
 straight flush |   0.000015    |       9       |   0.000017    |   -0.003712   |   0.003743    |      10       |
 ---------------------------------------------------------------------------------------------------------------
      Total     |   0.999999    |    579070     |   1.000000    |   0.967706    |   1.032293    |    579070     |
+---------------------------------------------------------------------------------------------------------------
+                                    Chi-Square Goodness of Fit Test Results                                    |
+---------------------------------------------------------------------------------------------------------------
+                      Chi-square                       |                      124.742555                       |
+                        p-value                        |                       0.000000                        |
 ---------------------------------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
@@ -157,6 +166,11 @@ straight flush |   0.000015    |       9       |   0.000017    |   -0.003712   |
       As       |   0.019231    |     3023      |   0.019253    |     3026      |
 -------------------------------------------------------------------------------
      Total     |   1.000000    |    157196     |   1.000000    |    157174     |
+-------------------------------------------------------------------------------
+                    Chi-Square Goodness of Fit Test Results                    |
+-------------------------------------------------------------------------------
+              Chi-square               |               32.396957               |
+                p-value                |               0.980401                |
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
@@ -257,6 +271,11 @@ straight flush |   0.000015    |       9       |   0.000017    |   -0.003712   |
       A A      |   0.004525    |      295      |   0.004231    |      276      |
 -------------------------------------------------------------------------------
      Total     |   1.000000    |     65221     |   1.000000    |     65236     |
+-------------------------------------------------------------------------------
+                    Chi-Square Goodness of Fit Test Results                    |
+-------------------------------------------------------------------------------
+              Chi-square               |               71.451145               |
+                p-value                |               0.925104                |
 -------------------------------------------------------------------------------
 ```
 
