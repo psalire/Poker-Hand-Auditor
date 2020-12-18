@@ -19,7 +19,7 @@ This script parses hand history files for hole and board cards and counts every 
 
 Final output is tables of the sample proportions compared to the expected with upper and lower confidence limits and chi-square goodness of fit test results.
 
-## Prerequisites
+## Dependencies
 
 - Python 3 (3.9.1)
 - treys - [A poker hand evaluation library](https://github.com/ihendley/treys)
