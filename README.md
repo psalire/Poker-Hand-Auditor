@@ -7,13 +7,13 @@ iTechlabs also uses Marsaglia's "diehard" tests which are not covered in this sc
 
 ## How it works
 
-Proportion of poker hands:
+(Proportion of poker hands)[https://en.wikipedia.org/wiki/Poker_probability]:
 
 | Hand       | High Card | Pair  | Two Pair | Trips | Straight | Flush | Full House | Quads  | Straight Flush |
 |------------|-----------|-------|----------|-------|----------|-------|------------|--------|----------------|
 | Proportion | 0.501     | 0.423 | 0.048    | 0.021 | 0.004    | 0.002 | 0.001      | 0.0002 | 0.00003        |
 
-A good, genuine RNG will produce these proportions given a significantly large sample size. Smaller sample sizes should fit within a reasonable confidence interval. In addition, the proportion of individual cards and hole cards together (not counting suits) should be uniform distributions.
+A good, genuine RNG will produce these proportions given a significantly large sample size. Smaller sample sizes should fit within a reasonable confidence interval. In addition, the proportion of individual cards and hole cards (not counting suits) should be uniform distributions.
 
 This script parses hand history files for hole and board cards and counts every drawn card, and all 5-card hands and their ranks (e.g. pair, straight, etc.). Optionally, also counts the hole card distribution and/or the distribution of all hand combinations of hole and board cards.
 
