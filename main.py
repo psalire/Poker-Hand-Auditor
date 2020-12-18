@@ -4,7 +4,7 @@ import argparse
 import Parse
 from treys import Card, Evaluator
 from itertools import combinations
-# from scipy.stats import chisquare
+from scipy.stats import chisquare
 from math import sqrt
 
 CARDS = [
@@ -32,16 +32,16 @@ CARDS = [
 ## label_column_size: width of first column
 ## value_column_size: width of other columns
 ## columns: number of columns to read from parameters expected and sample
-def print_results(title, label, expected, sample, std_dev=2, label_column_size=18, value_column_size=13, is_normal=True):
+def print_results(title, label, expected, sample, std_dev=2, label_column_size=15, value_column_size=15, is_normal=True):
     columns = 6 if is_normal else 4
-    full_width = label_column_size + value_column_size*columns + columns*3
+    full_width = label_column_size + value_column_size*columns + columns
     horizontal_divider = ('{:-^%d}' % full_width).format('')
 
     # Format string based on number and size of columns
-    label_column = '{:^%d} | '%label_column_size
+    label_column = '{:^%d}|'%label_column_size
     sample_size_column = '{:^%d}' % value_column_size
-    results_row = label_column + ('{:^%d} | ' % value_column_size)*(columns-2) + f'{sample_size_column} | {sample_size_column}'
-    totals_row = label_column + ('{:^%df} | ' % value_column_size)*(columns-2) + f'{sample_size_column} | {sample_size_column}'
+    results_row = label_column + ('{:^%d}|' % value_column_size)*columns
+    totals_row = label_column + ('{:^%df}|' % value_column_size)*(columns-2) + ('{:^%d}|' % value_column_size)*2
     column_value = '{:^%df}' % (value_column_size)
 
     sample_size = sum(sample.values())
@@ -58,11 +58,11 @@ def print_results(title, label, expected, sample, std_dev=2, label_column_size=1
         print(results_row.format(label, 'Expected', 'Sample', 'Expected Size', 'Sample Size'))
     print(horizontal_divider)
     sums = [0 for _ in range(columns)]
+    expected_sizes = []
     for key in sample:
         sample_percentage = sample[key]/sample_size
         expected_size = round(expected[key]*sample_size)
-        # e.append(sample_percentage)
-        # z.append(expected[key])
+        expected_sizes.append(expected_size)
 
         # Calculate standard error
         ## can't divide by zero
@@ -113,6 +113,8 @@ def print_results(title, label, expected, sample, std_dev=2, label_column_size=1
             sums[3] += sample[key]
     print(horizontal_divider)
     print(totals_row.format('Total', *(sum for sum in sums)))
+    # print(list(sample.values()), expected_sizes)
+    # print(chisquare(list(sample.values()), expected_sizes))
     assert sample_size == sums[5 if is_normal else 3] # Sanity check for sample size
 
 # Helper function for counting hole cards
