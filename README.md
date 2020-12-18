@@ -7,14 +7,23 @@ iTechlabs also uses Marsaglia's "diehard" tests which are not covered in this sc
 
 ## How it works
 
-It parses hand history files for hole and board cards while counting every drawn card, and all 5-card hands and their ranks (e.g. pair, straight, etc.). Optionally, also count the hole card distribution and/or the distribution of all hand combinations of hole and board cards.
+This script parses hand history files for hole and board cards and counts every drawn card, and all 5-card hands and their ranks (e.g. pair, straight, etc.). Optionally, also counts the hole card distribution and/or the distribution of all hand combinations of hole and board cards.
 
 Final output is tables of the sample proportions compared to the expected with upper and lower confidence limits and chi-square goodness of fit test results.
+
+Proportion of poker hands:
+
+| Hand       | High Card | Pair  | Two Pair | Trips | Straight | Flush | Full House | Quads  | Straight Flush |
+|------------|-----------|-------|----------|-------|----------|-------|------------|--------|----------------|
+| Proportion | 0.501     | 0.423 | 0.048    | 0.021 | 0.004    | 0.002 | 0.001      | 0.0002 | 0.00003        |
+
+A good, genuine RNG will produce this proportion of poker hands given a significantly large sample size. Smaller sample sizes should fit within a reasonable confidence interval. In addition, the proportion of individual cards and hole cards together (not counting suits) should be uniform distributions.
 
 ## Prerequisites
 
 - Python 3 (3.9.1)
 - treys (`python -m pip install treys`) - [A poker hand evaluation library](https://github.com/ihendley/treys)
+- scipy - ([Installation directions](https://scipy.org/install.html))
 
 ## Files
 
@@ -290,4 +299,4 @@ Above in the sample output looking at the second table showing all hand combinat
 
 However, when looking at the first table showing the actual hand distribution of the sample, it's clear that the distribution is very irregular. All hands except for four of a kind and straight fall significantly outside of the 99.7% confidence interval. In addition, the most common hand by far was a pair, not high card as is expected.
 
-This sample shows an invalid RNG algorithm. More samples are needed to reach a conclusion.
+This sample shows a bad RNG algorithm. More samples are needed to reach a conclusion.
