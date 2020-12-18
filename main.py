@@ -23,7 +23,7 @@ CARDS = [
     'Ac','Ad','Ah','As',
 ]
 
-# Helper functions for print_results
+# Helper functions for calculate_and_print_results
 def format_if_valid(format_str, val, append=''):
     return format_str.format(val) if val != None else str(val)+append
 
@@ -36,7 +36,7 @@ def format_if_valid(format_str, val, append=''):
 ## label_column_size: int, width of first column
 ## value_column_size: int, width of other columns
 ## is_normal: bool, is normally distributed, whether to calculate confidence intervals
-def print_results(title, label, expected, sample, std_dev=2, label_column_size=15, value_column_size=15, is_normal=True):
+def calculate_and_print_results(title, label, expected, sample, std_dev=2, label_column_size=15, value_column_size=15, is_normal=True):
     columns = 6 if is_normal else 4
     full_width = label_column_size + value_column_size*columns + columns
     horizontal_divider = ('{:-^%d}' % full_width).format('')
@@ -73,7 +73,7 @@ def print_results(title, label, expected, sample, std_dev=2, label_column_size=1
     print_with_divider(value_span_fullwidth.format(title))
     print_with_divider(results_row.format(*column_name_args))
 
-    sums = [0 for _ in range(columns)]
+    totals = [0 for _ in range(columns)]
     expected_sizes = []
 
     # Print column values
@@ -82,9 +82,10 @@ def print_results(title, label, expected, sample, std_dev=2, label_column_size=1
         expected_size = round(expected[key]*sample_size)
         expected_sizes.append(expected_size)
 
-        # Calculate standard error
-        ## can't divide by zero
+        # Print row of values
         if is_normal:
+            # Calculate standard error
+            ## can't divide by zero
             if sample[key] != 0:
                 standard_error = sqrt((expected[key] * (1-expected[key])) / sample[key])
                 lower_percentage = expected[key] - std_dev*standard_error
@@ -113,20 +114,21 @@ def print_results(title, label, expected, sample, std_dev=2, label_column_size=1
                     sample[key], # Sample size
                 )
             )
-        sums[0] += expected[key]
+        # Count totals
+        totals[0] += expected[key]
         if is_normal:
-            sums[1] += expected_size
+            totals[1] += expected_size
             if standard_error:
-                sums[2] += sample_percentage
-                sums[3] += lower_percentage
-                sums[4] += upper_percentage
-            sums[5] += sample[key]
+                totals[2] += sample_percentage
+                totals[3] += lower_percentage
+                totals[4] += upper_percentage
+            totals[5] += sample[key]
         else:
-            sums[1] += expected_size
-            sums[2] += sample_percentage
-            sums[3] += sample[key]
+            totals[1] += expected_size
+            totals[2] += sample_percentage
+            totals[3] += sample[key]
     print(horizontal_divider)
-    print_with_divider(totals_row.format('Total', *(sum for sum in sums)))
+    print_with_divider(totals_row.format('Total', *(total for total in totals)))
 
     # Find and print chi-square values
     if 0 not in expected_sizes:
@@ -143,7 +145,7 @@ def print_results(title, label, expected, sample, std_dev=2, label_column_size=1
         format_if_valid(float_value_span_halfwidth, chi_square_pvalue, ' (An expected value == 0)'),
     ))
 
-    assert sample_size == sums[5 if is_normal else 3] # Sanity check for sample size
+    assert sample_size == totals[5 if is_normal else 3] # Sanity check for sample size
 
 # Helper function for counting hole cards
 ## hole_cards: tuple, pair of hole cards
@@ -221,7 +223,7 @@ def main():
                 # Individual card frequency
                 card_frequency[c_1] += 1
                 card_frequency[c_2] += 1
-                # Frequency of hole cards as a pair
+                # Frequency of hole cards together
                 if args.holecardswithsuits:
                     count_hole_cards_frequency((c_1,c_2), hole_card_frequency)
                 if args.holecards:
@@ -232,20 +234,22 @@ def main():
             if not board:
                 continue
 
-            # Count card frequency of board cards
+            # Count frequency of individual board cards
             for c in board:
                 card_frequency[c] += 1
 
-            # Get all combinations of 5 card hands of hole cards with board
-            # and count hand frequency
+            # Count hand frequencies
             for hc in hole_cards:
+                # Hand frequency of hole cards with board
                 count_hand_frequency(hc, board, evaluator, hand_frequency)
 
+                # Hand frequency of all combinations of hole cards with board
                 if args.allcombinations:
                     for hand in combinations(list(hc)+board, 5):
                         count_hand_frequency(hand[:2], hand[2:], evaluator, hand_allcombinations_frequency)
 
-    print_results(
+    # Print all results
+    calculate_and_print_results(
         'Distribution of Hands',
         'Hand',
         hand_probabilites,
@@ -253,14 +257,14 @@ def main():
         std_dev=args.stdev,
     )
     if args.allcombinations:
-        print_results(
+        calculate_and_print_results(
             'Distribution of All Hand Combinations',
             'Hand',
             hand_probabilites,
             hand_allcombinations_frequency,
             std_dev=args.stdev,
         )
-    print_results(
+    calculate_and_print_results(
         'Distribution of Cards',
         'Card',
         {x: 1/len(CARDS) for x in CARDS},
@@ -272,7 +276,7 @@ def main():
         hole_card_combinations = [' '.join(x) for x in combinations(CARDS, 2)]
         hole_card_expected_frequency = {x: hole_card_combinations.count(x) / len(hole_card_combinations) for x in hole_card_combinations}
 
-        print_results(
+        calculate_and_print_results(
             'Distribution of Hole Cards with suits',
             'Hole Cards',
             hole_card_expected_frequency,
@@ -284,7 +288,7 @@ def main():
         hole_card_nosuit_combinations = [' '.join((x[0], y[0])) for x, y in combinations(CARDS, 2)]
         hole_card_nosuits_expected_frequency = {x: hole_card_nosuit_combinations.count(x) / len(hole_card_nosuit_combinations) for x in hole_card_nosuit_combinations}
 
-        print_results(
+        calculate_and_print_results(
             'Distribution of Hole Cards without suits',
             'Hole Cards',
             hole_card_nosuits_expected_frequency,
