@@ -54,8 +54,7 @@ def print_results(title, label, expected, sample, std_dev=2, label_column_size=1
     float_value_column = '{:^%df}|' % value_column_size
     value_column_span_halfwidth = '{:^%d}|' % (full_width // 2)
     value_span_fullwidth = '{:^%d}|' % full_width
-
-    # Row formatting
+    ## Row formatting
     results_row = label_column + value_column*columns
     totals_row = label_column + float_value_column + value_column + float_value_column*(columns-3) + value_column
     chi_square_row = value_column_span_halfwidth*2
@@ -143,6 +142,7 @@ def print_results(title, label, expected, sample, std_dev=2, label_column_size=1
         'p-value',
         format_if_valid(float_value_span_halfwidth, chi_square_pvalue, ' (An expected value == 0)'),
     ))
+    
     assert sample_size == sums[5 if is_normal else 3] # Sanity check for sample size
 
 # Helper function for counting hole cards
