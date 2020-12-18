@@ -173,7 +173,7 @@ def count_hand_frequency(hole_cards, board, evaluator, hand_frequency):
 
 def main():
     # Argparse
-    argparser = argparse.ArgumentParser(description="This script takes a user's poker hand history calculates proportion of card draws and hands compared to the expected values, their confidence intervals, and chi-square p-values to determine if the site's RNG is behaving as expected.")
+    argparser = argparse.ArgumentParser(description="This script takes a user's poker hand history and calculates proportions of card draws and hands compared to the expected values, their confidence intervals, and chi-square p-values to determine if the site's RNG is behaving as expected.")
     argparser.add_argument('path', type=str, help='Path to hand history directory')
     argparser.add_argument('--allcombinations', action='store_true', help='Show table for frequency of all combinations between hole and board cards.')
     argparser.add_argument('--onlyme', action='store_true', help='Only count my hands')
