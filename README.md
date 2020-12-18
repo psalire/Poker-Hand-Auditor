@@ -7,7 +7,7 @@ iTechlabs also uses Marsaglia's "diehard" tests which are not covered in this sc
 
 ## How it works
 
-(Proportion of poker hands)[https://en.wikipedia.org/wiki/Poker_probability]:
+[Proportion of poker hands](https://en.wikipedia.org/wiki/Poker_probability):
 
 | Hand       | High Card | Pair  | Two Pair | Trips | Straight | Flush | Full House | Quads  | Straight Flush |
 |------------|-----------|-------|----------|-------|----------|-------|------------|--------|----------------|
