@@ -33,9 +33,9 @@ def format_if_valid(format_str, val):
 ## expected: dict, expected values
 ## sample: dict, sampled values
 ## std_dev: int 1,2,3, std_dev for use in confidence limit
-## label_column_size: width of first column
-## value_column_size: width of other columns
-## columns: number of columns to read from parameters expected and sample
+## label_column_size: int, width of first column
+## value_column_size: int, width of other columns
+## is_normal: bool, is normally distributed, whether to calculate confidence intervals
 def print_results(title, label, expected, sample, std_dev=2, label_column_size=15, value_column_size=15, is_normal=True):
     columns = 6 if is_normal else 4
     full_width = label_column_size + value_column_size*columns + columns
