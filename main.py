@@ -32,16 +32,16 @@ CARDS = [
 ## label_column_size: width of first column
 ## value_column_size: width of other columns
 ## columns: number of columns to read from parameters expected and sample
-def print_results(title, label, expected, sample, std_dev=2, label_column_size=18, value_column_size=12, is_normal=True):
-    columns = 5 if is_normal else 3
+def print_results(title, label, expected, sample, std_dev=2, label_column_size=18, value_column_size=13, is_normal=True):
+    columns = 6 if is_normal else 4
     full_width = label_column_size + value_column_size*columns + columns*3
     horizontal_divider = ('{:-^%d}' % full_width).format('')
 
     # Format string based on number and size of columns
     label_column = '{:^%d} | '%label_column_size
-    sample_size_column = '{:^%d}'%value_column_size
-    results_row = label_column + ''.join(['{:^%d} | '%value_column_size for _ in range(columns-1)]) + sample_size_column
-    totals_row = label_column + ''.join(['{:^%df} | '%value_column_size for _ in range(columns-1)]) + sample_size_column
+    sample_size_column = '{:^%d}' % value_column_size
+    results_row = label_column + ('{:^%d} | ' % value_column_size)*(columns-2) + f'{sample_size_column} | {sample_size_column}'
+    totals_row = label_column + ('{:^%df} | ' % value_column_size)*(columns-2) + f'{sample_size_column} | {sample_size_column}'
     column_value = '{:^%df}' % (value_column_size)
 
     sample_size = sum(sample.values())
@@ -51,15 +51,16 @@ def print_results(title, label, expected, sample, std_dev=2, label_column_size=1
         confidence_limit = ['68', '95', '99.7'][std_dev-1]
         print(('{:^%d}' % full_width).format('{}, {}% Confidence Limit, n={}'.format(title, confidence_limit, sample_size)))
         print(horizontal_divider)
-        print(results_row.format(label, 'Expected', 'Sample', 'Lower', 'Upper', 'Sample Size'))
+        print(results_row.format(label, 'Expected', 'Sample', 'Lower', 'Upper', 'Expected Size', 'Sample Size'))
     else:
         print(('{:^%d}' % full_width).format('{}, n={}'.format(title, sample_size)))
         print(horizontal_divider)
-        print(results_row.format(label, 'Expected', 'Sample', 'Sample Size'))
+        print(results_row.format(label, 'Expected', 'Sample', 'Expected Size', 'Sample Size'))
     print(horizontal_divider)
     sums = [0 for _ in range(columns)]
     for key in sample:
         sample_percentage = sample[key]/sample_size
+        expected_size = round(expected[key]*sample_size)
         # e.append(sample_percentage)
         # z.append(expected[key])
 
@@ -76,24 +77,26 @@ def print_results(title, label, expected, sample, std_dev=2, label_column_size=1
                 upper_percentage = None
 
             print(results_row.format(
-                    key,
+                    key, # Label
                     *(
                         # If value is None, do str(None), else print the float value
                         (column_value.format(x) if x != None else str(x)
                             for x in [expected[key], sample_percentage, lower_percentage, upper_percentage])
-                    ),
-                    sample[key],
+                    ), # Proportions
+                    expected_size, # Expected size
+                    sample[key], # Sample size
                 )
             )
         else:
             print(results_row.format(
-                    key,
+                    key, # Label
                     *(
                         # If value is None, do str(None), else print the float value
                         (column_value.format(x) if x != None else str(x)
                             for x in [expected[key], sample_percentage])
-                    ),
-                    sample[key],
+                    ), # Proportions,
+                    expected_size, # Expected size
+                    sample[key], # Sample size
                 )
             )
         sums[0] += expected[key]
@@ -102,13 +105,15 @@ def print_results(title, label, expected, sample, std_dev=2, label_column_size=1
                 sums[1] += sample_percentage
                 sums[2] += lower_percentage
                 sums[3] += upper_percentage
-            sums[4] += sample[key]
+            sums[4] += expected_size
+            sums[5] += sample[key]
         else:
             sums[1] += sample_percentage
-            sums[2] += sample[key]
+            sums[2] += expected_size
+            sums[3] += sample[key]
     print(horizontal_divider)
     print(totals_row.format('Total', *(sum for sum in sums)))
-    assert sample_size == sums[4 if is_normal else 2] # Sanity check for sample size
+    assert sample_size == sums[5 if is_normal else 3] # Sanity check for sample size
 
 # Helper function for counting hole cards
 ## hole_cards: tuple, pair of hole cards
