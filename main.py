@@ -119,14 +119,31 @@ def count_hole_cards_frequency(hole_cards, frequency_dict):
     if k not in frequency_dict:
         k = ' '.join(hole_cards[::-1]) # Reverse order of cards in key
     frequency_dict[k] += 1
+# Helper function for counting hands
+## hole_cards: list of strs, 2 card hand
+## board: list of strs, 3-5 cards
+## evaluator: treys.Evaluator
+## hand_frequency: dict, count hand frequency
+def count_hand_frequency(hole_cards, board, evaluator, hand_frequency):
+    # Evaluate hand for rank
+    hand_rank = evaluator.class_to_string(
+    evaluator.get_rank_class(
+            evaluator.evaluate(
+                [Card.new(x) for x in hole_cards],
+                [Card.new(x) for x in board]
+            )
+        )
+    ).lower()
+    hand_frequency[hand_rank] += 1
 
 def main():
     # Argparse
     argparser = argparse.ArgumentParser(description='Poker Hand Auditor')
     argparser.add_argument('path', type=str, help='Path to hand history directory')
+    argparser.add_argument('--allcombinations', action='store_true', help='Show table for frequency of all combinations between hole and board cards.')
     argparser.add_argument('--onlyme', action='store_true', help='Only count my hands')
-    argparser.add_argument('--holecards', action='store_true', help='Show table for frequency of hole cards with suits (Long output)')
-    argparser.add_argument('--holecardsnosuits', action='store_true', help='Show table for frequency of hole cards without suits')
+    argparser.add_argument('--holecards', action='store_true', help='Show table for frequency of hole cards without suits')
+    argparser.add_argument('--holecardswithsuits', action='store_true', help='Show table for frequency of hole cards with suits (Long output)')
     argparser.add_argument('--stdev', choices=[1,2,3], default=2, type=int,
                             help='Stdev for confidence limit, so 1 for 68%%, 2 for 95%%, and 3 for 99.7%%. Default=2')
     argparser.add_argument('--site', choices=['Bovada'], default='Bovada', type=str,
@@ -140,9 +157,11 @@ def main():
     hand_probabilites = Parse.HAND_PROBABILITIES
     card_frequency = {x: 0 for x in CARDS}
     hand_frequency = {x: 0 for x in hand_probabilites.keys()}
-    if args.holecards:
+    if args.allcombinations:
+        hand_allcombinations_frequency = {x: 0 for x in hand_probabilites.keys()}
+    if args.holecardswithsuits:
         hole_card_frequency = {' '.join(x): 0 for x in combinations(CARDS, 2)}
-    if args.holecardsnosuits:
+    if args.holecards:
         hole_card_nosuits_frequency = {' '.join(x): 0 for x in combinations([c[0] for c in CARDS], 2)} # Remove suit from cards
 
     # Treys evaluator
@@ -168,9 +187,9 @@ def main():
                 card_frequency[c_1] += 1
                 card_frequency[c_2] += 1
                 # Frequency of hole cards as a pair
-                if args.holecards:
+                if args.holecardswithsuits:
                     count_hole_cards_frequency((c_1,c_2), hole_card_frequency)
-                if args.holecardsnosuits:
+                if args.holecards:
                     count_hole_cards_frequency([x[0] for x in (c_1,c_2)], hole_card_nosuits_frequency)
 
             # Get board cards
@@ -185,18 +204,11 @@ def main():
             # Get all combinations of 5 card hands of hole cards with board
             # and count hand frequency
             for hc in hole_cards:
-                for hand in combinations(list(hc)+board, 5):
-                    # There doesn't seem to be support in Treys for
-                    # evaluating 5 card hands, so split hand into 3 and 2
-                    hand_treys_1 = [Card.new(c) for c in hand[:3]]
-                    hand_treys_2 = [Card.new(c) for c in hand[3:5]]
-                    # Evaluate hand for rank
-                    hand_rank = evaluator.class_to_string(
-                        evaluator.get_rank_class(
-                            evaluator.evaluate(hand_treys_1, hand_treys_2)
-                        )
-                    ).lower()
-                    hand_frequency[hand_rank] += 1
+                count_hand_frequency(hc, board, evaluator, hand_frequency)
+
+                if args.allcombinations:
+                    for hand in combinations(list(hc)+board, 5):
+                        count_hand_frequency(hand[:2], hand[2:], evaluator, hand_allcombinations_frequency)
 
     print_results(
         'Distribution of Hands',
@@ -205,6 +217,14 @@ def main():
         hand_frequency,
         std_dev=args.stdev,
     )
+    if args.allcombinations:
+        print_results(
+            'Distribution of All Hand Combinations',
+            'Hand',
+            hand_probabilites,
+            hand_allcombinations_frequency,
+            std_dev=args.stdev,
+        )
     print_results(
         'Distribution of Cards',
         'Card',
@@ -213,7 +233,7 @@ def main():
         std_dev=args.stdev,
         is_normal=False
     )
-    if args.holecards:
+    if args.holecardswithsuits:
         hole_card_combinations = [' '.join(x) for x in combinations(CARDS, 2)]
         hole_card_expected_frequency = {x: hole_card_combinations.count(x) / len(hole_card_combinations) for x in hole_card_combinations}
 
@@ -225,7 +245,7 @@ def main():
             std_dev=args.stdev,
             is_normal=False,
         )
-    if args.holecardsnosuits:
+    if args.holecards:
         hole_card_nosuit_combinations = [' '.join((x[0], y[0])) for x, y in combinations(CARDS, 2)]
         hole_card_nosuits_expected_frequency = {x: hole_card_nosuit_combinations.count(x) / len(hole_card_nosuit_combinations) for x in hole_card_nosuit_combinations}
 
