@@ -51,11 +51,11 @@ def print_results(title, label, expected, sample, std_dev=2, label_column_size=1
         confidence_limit = ['68', '95', '99.7'][std_dev-1]
         print(('{:^%d}' % full_width).format('{}, {}% Confidence Limit, n={}'.format(title, confidence_limit, sample_size)))
         print(horizontal_divider)
-        print(results_row.format(label, 'Expected', 'Sample', 'Lower', 'Upper', 'Size'))
+        print(results_row.format(label, 'Expected', 'Sample', 'Lower', 'Upper', 'Sample Size'))
     else:
         print(('{:^%d}' % full_width).format('{}, n={}'.format(title, sample_size)))
         print(horizontal_divider)
-        print(results_row.format(label, 'Expected', 'Sample', 'Size'))
+        print(results_row.format(label, 'Expected', 'Sample', 'Sample Size'))
     print(horizontal_divider)
     sums = [0 for _ in range(columns)]
     for key in sample:
@@ -107,7 +107,7 @@ def print_results(title, label, expected, sample, std_dev=2, label_column_size=1
             sums[1] += sample_percentage
             sums[2] += sample[key]
     print(horizontal_divider)
-    print(totals_row.format('Sum', *(sum for sum in sums)))
+    print(totals_row.format('Total', *(sum for sum in sums)))
     assert sample_size == sums[4 if is_normal else 2] # Sanity check for sample size
 
 # Helper function for counting hole cards
