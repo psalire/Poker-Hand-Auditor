@@ -65,12 +65,12 @@ def print_results(title, label, expected, sample, std_dev=2, label_column_size=1
     print('\n'+horizontal_divider)
     if is_normal:
         confidence_limit = ['68', '95', '99.7'][std_dev-1]
-        title_args = (title, confidence_limit, sample_size)
+        title = '{}, {}% Confidence Level, n={}'.format(title, confidence_limit, sample_size)
         column_name_args = (label, 'Expected', 'Expected Size','Sample', 'Lower', 'Upper', 'Sample Size')
     else:
-        title_args = (title, sample_size)
+        title = '{}, n={}'.format(title, sample_size)
         column_name_args = (label, 'Expected', 'Expected Size','Sample', 'Sample Size')
-    print_with_divider(value_span_fullwidth.format('{}, n={}'.format(*title_args)))
+    print_with_divider(value_span_fullwidth.format(title))
     print_with_divider(results_row.format(*column_name_args))
 
     sums = [0 for _ in range(columns)]
@@ -142,7 +142,7 @@ def print_results(title, label, expected, sample, std_dev=2, label_column_size=1
         'p-value',
         format_if_valid(float_value_span_halfwidth, chi_square_pvalue, ' (An expected value == 0)'),
     ))
-    
+
     assert sample_size == sums[5 if is_normal else 3] # Sanity check for sample size
 
 # Helper function for counting hole cards
