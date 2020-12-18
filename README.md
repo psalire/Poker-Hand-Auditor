@@ -262,4 +262,6 @@ optional arguments:
 
 Above in the sample output looking at the second table showing all hand combinations, it was found that the "high card" and "pair" sample values are not within the lower and upper values of the 99.7% confidence interval. The high card sample value was below the lower, and the pair sample value was above the upper 99.7% confidence limit. This means these that sample values fall within 0.3% of the expected outcomes given the current sample size, which is extremely unusual but still not completely impossible.
 
-However, when looking at the first table showing the actual hand distribution of the sample, it's clear that the distribution is very irregular. All hands except for four of a kind and straight fall significantly outside of the 99.7% confidence interval. In addition, the most common hand by far was a pair, not high card as is expected. This sample shows an invalid RNG algorithm. More samples are needed to reach a conclusion.
+However, when looking at the first table showing the actual hand distribution of the sample, it's clear that the distribution is very irregular. All hands except for four of a kind and straight fall significantly outside of the 99.7% confidence interval. In addition, the most common hand by far was a pair, not high card as is expected.
+
+This sample shows an invalid RNG algorithm. More samples are needed to reach a conclusion.
