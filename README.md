@@ -25,7 +25,7 @@ Final output is tables of the sample proportions compared to the expected with u
 - treys - [A poker hand evaluation library](https://github.com/ihendley/treys)
     - `python -m pip install treys`
 - scipy - For chi-square tests
-    - [Installation directions](https://scipy.org/install.html)
+    - `python -m pip install scipy matplotlib ipython jupyter pandas sympy nose numpy==1.19.3`
 
 ## Files
 
