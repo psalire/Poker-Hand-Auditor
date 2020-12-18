@@ -23,6 +23,10 @@ CARDS = [
     'Ac','Ad','Ah','As',
 ]
 
+# Helper function for formatting
+def format_if_valid(format_str, val):
+    return format_str.format(val) if val != None else str(val)
+
 # Print table of results
 ## title: str, title of the table
 ## label: str, label of the first column
@@ -40,22 +44,25 @@ def print_results(title, label, expected, sample, std_dev=2, label_column_size=1
     # Format string based on number and size of columns
     label_column = '{:^%d}|'%label_column_size
     sample_size_column = '{:^%d}' % value_column_size
-    results_row = label_column + ('{:^%d}|' % value_column_size)*columns
-    totals_row = label_column + ('{:^%df}|' % value_column_size)*(columns-2) + ('{:^%d}|' % value_column_size)*2
-    column_value = '{:^%df}' % (value_column_size)
+    value_column = '{:^%d}|' % value_column_size
+    value_column_float = '{:^%df}|' % value_column_size
+    float_value = '{:^%df}' % (value_column_size)
+
+    results_row = label_column + value_column*columns
+    totals_row = label_column + value_column_float + value_column + value_column_float*(columns-3) + value_column
 
     sample_size = sum(sample.values())
 
     print('\n'+horizontal_divider)
     if is_normal:
         confidence_limit = ['68', '95', '99.7'][std_dev-1]
-        print(('{:^%d}' % full_width).format('{}, {}% Confidence Limit, n={}'.format(title, confidence_limit, sample_size)))
+        print(('{:^%d}|' % full_width).format('{}, {}% Confidence Limit, n={}'.format(title, confidence_limit, sample_size)))
         print(horizontal_divider)
-        print(results_row.format(label, 'Expected', 'Sample', 'Lower', 'Upper', 'Expected Size', 'Sample Size'))
+        print(results_row.format(label, 'Expected', 'Expected Size','Sample', 'Lower', 'Upper', 'Sample Size'))
     else:
-        print(('{:^%d}' % full_width).format('{}, n={}'.format(title, sample_size)))
+        print(('{:^%d}|' % full_width).format('{}, n={}'.format(title, sample_size)))
         print(horizontal_divider)
-        print(results_row.format(label, 'Expected', 'Sample', 'Expected Size', 'Sample Size'))
+        print(results_row.format(label, 'Expected', 'Expected Size', 'Sample', 'Sample Size'))
     print(horizontal_divider)
     sums = [0 for _ in range(columns)]
     expected_sizes = []
@@ -78,41 +85,38 @@ def print_results(title, label, expected, sample, std_dev=2, label_column_size=1
 
             print(results_row.format(
                     key, # Label
-                    *(
-                        # If value is None, do str(None), else print the float value
-                        (column_value.format(x) if x != None else str(x)
-                            for x in [expected[key], sample_percentage, lower_percentage, upper_percentage])
-                    ), # Proportions
+                    format_if_valid(float_value, expected[key]), # Expected proportion
                     expected_size, # Expected size
+                    format_if_valid(float_value, sample_percentage), # Sample proportion
+                    format_if_valid(float_value, lower_percentage), # Upper confidence limit
+                    format_if_valid(float_value, upper_percentage), # Lower confidence limit
                     sample[key], # Sample size
                 )
             )
         else:
             print(results_row.format(
                     key, # Label
-                    *(
-                        # If value is None, do str(None), else print the float value
-                        (column_value.format(x) if x != None else str(x)
-                            for x in [expected[key], sample_percentage])
-                    ), # Proportions,
+                    format_if_valid(float_value, expected[key]), # Expected proportion
                     expected_size, # Expected size
+                    format_if_valid(float_value, sample_percentage), # Sample proportion
                     sample[key], # Sample size
                 )
             )
         sums[0] += expected[key]
         if is_normal:
+            sums[1] += expected_size
             if standard_error:
-                sums[1] += sample_percentage
-                sums[2] += lower_percentage
-                sums[3] += upper_percentage
-            sums[4] += expected_size
+                sums[2] += sample_percentage
+                sums[3] += lower_percentage
+                sums[4] += upper_percentage
             sums[5] += sample[key]
         else:
-            sums[1] += sample_percentage
-            sums[2] += expected_size
+            sums[1] += expected_size
+            sums[2] += sample_percentage
             sums[3] += sample[key]
     print(horizontal_divider)
     print(totals_row.format('Total', *(sum for sum in sums)))
+    print(horizontal_divider)
     # print(list(sample.values()), expected_sizes)
     # print(chisquare(list(sample.values()), expected_sizes))
     assert sample_size == sums[5 if is_normal else 3] # Sanity check for sample size
