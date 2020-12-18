@@ -59,7 +59,6 @@ def print_results(title, label, expected, sample, std_dev=2, label_column_size=1
     results_row = label_column + value_column*columns
     totals_row = label_column + float_value_column + value_column + float_value_column*(columns-3) + value_column
     chi_square_row = value_column_span_halfwidth + float_column_span_halfwidth
-    chi_square_label_row = value_column_span_halfwidth*2
 
     sample_size = sum(sample.values())
 
