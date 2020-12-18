@@ -23,7 +23,7 @@ CARDS = [
     'Ac','Ad','Ah','As',
 ]
 
-# Helper function for formatting
+# Helper functions for print_results
 def format_if_valid(format_str, val):
     return format_str.format(val) if val != None else str(val)
 
@@ -41,31 +41,44 @@ def print_results(title, label, expected, sample, std_dev=2, label_column_size=1
     full_width = label_column_size + value_column_size*columns + columns
     horizontal_divider = ('{:-^%d}' % full_width).format('')
 
+    def print_with_divider(string):
+        print(string)
+        print(horizontal_divider)
+
     # Format string based on number and size of columns
     label_column = '{:^%d}|'%label_column_size
     sample_size_column = '{:^%d}' % value_column_size
     value_column = '{:^%d}|' % value_column_size
-    value_column_float = '{:^%df}|' % value_column_size
-    float_value = '{:^%df}' % (value_column_size)
+    float_value_column = '{:^%df}|' % value_column_size
+    float_value = '{:^%df}' % value_column_size
+    value_column_span_halfwidth = '{:^%d}|' % (full_width // 2)
+    float_column_span_halfwidth = '{:^%df}|' % (full_width // 2)
 
+    # Row formatting
+    full_width_row = '{:^%d}|' % full_width
     results_row = label_column + value_column*columns
-    totals_row = label_column + value_column_float + value_column + value_column_float*(columns-3) + value_column
+    totals_row = label_column + float_value_column + value_column + float_value_column*(columns-3) + value_column
+    chi_square_row = value_column_span_halfwidth + float_column_span_halfwidth
+    chi_square_label_row = value_column_span_halfwidth*2
 
     sample_size = sum(sample.values())
 
+    # Print title and column headers
     print('\n'+horizontal_divider)
     if is_normal:
         confidence_limit = ['68', '95', '99.7'][std_dev-1]
-        print(('{:^%d}|' % full_width).format('{}, {}% Confidence Limit, n={}'.format(title, confidence_limit, sample_size)))
-        print(horizontal_divider)
-        print(results_row.format(label, 'Expected', 'Expected Size','Sample', 'Lower', 'Upper', 'Sample Size'))
+        title_args = (title, confidence_limit, sample_size)
+        column_name_args = (label, 'Expected', 'Expected Size','Sample', 'Lower', 'Upper', 'Sample Size')
     else:
-        print(('{:^%d}|' % full_width).format('{}, n={}'.format(title, sample_size)))
-        print(horizontal_divider)
-        print(results_row.format(label, 'Expected', 'Expected Size', 'Sample', 'Sample Size'))
-    print(horizontal_divider)
+        title_args = (title, sample_size)
+        column_name_args = (label, 'Expected', 'Expected Size','Sample', 'Sample Size')
+    print_with_divider(full_width_row.format('{}, n={}'.format(*title_args)))
+    print_with_divider(results_row.format(*column_name_args))
+
     sums = [0 for _ in range(columns)]
     expected_sizes = []
+
+    # Print column values
     for key in sample:
         sample_percentage = sample[key]/sample_size
         expected_size = round(expected[key]*sample_size)
@@ -115,10 +128,15 @@ def print_results(title, label, expected, sample, std_dev=2, label_column_size=1
             sums[2] += sample_percentage
             sums[3] += sample[key]
     print(horizontal_divider)
-    print(totals_row.format('Total', *(sum for sum in sums)))
-    print(horizontal_divider)
-    # print(list(sample.values()), expected_sizes)
-    # print(chisquare(list(sample.values()), expected_sizes))
+    print_with_divider(totals_row.format('Total', *(sum for sum in sums)))
+
+    # Find and print chi-square values
+    chi_square, chi_square_pvalue = chisquare(list(sample.values()), f_exp=expected_sizes)
+    print_with_divider(full_width_row.format('Chi-Square Goodness of Fit Test Results'))
+    print_with_divider(
+        chi_square_row.format('Chi-square', chi_square)+'\n'+
+        chi_square_row.format('p-value', chi_square_pvalue),
+    )
     assert sample_size == sums[5 if is_normal else 3] # Sanity check for sample size
 
 # Helper function for counting hole cards
