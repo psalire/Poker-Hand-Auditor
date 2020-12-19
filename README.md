@@ -332,10 +332,12 @@ straight flush |   0.000015    |       9       |   0.000017    |   -0.003712   |
 
 ## Interpreting Results
 
-Above in the sample output looking at the second table showing all hand combinations, it was found that the "high card" and "pair" sample values are not within the lower and upper values of the 99.7% confidence interval. The high card sample value was below the lower, and the pair sample value was above the upper 99.7% confidence limit. This means these that sample values fall within 0.3% of the expected outcomes given the current sample size, which is extremely unusual but still not completely impossible.
+Above in the sample output looking at the first table showing the sampled hand distribution, it's clear that the distribution is very irregular. All hands except for four of a kind and straight flush fall significantly outside of the 99.7% confidence interval. In addition, the most common hand by far was a pair, not high card as is expected.
 
-However, when looking at the first table showing the actual hand distribution of the sample, it's clear that the distribution is very irregular. All hands except for four of a kind and straight fall significantly outside of the 99.7% confidence interval. In addition, the most common hand by far was a pair, not high card as is expected.
+Furthermore, even when taking all combinations of the hole and board cards in the second table, both high card and pair hands fall outside the 99.7% confidence interval.
 
-Chi-squared tests also rejected conformity to the expected distribution (p < 0.05).
+Chi-squared tests also rejects conformity to the expected hand distributions (p < 0.05).
 
-This sample shows a bad RNG algorithm. More samples are needed to reach a conclusion.
+The distribution of individual cards and hole cards however passed the chi-squared tests (p > 0.05), accepting the expected proportions.
+
+Overall, this sample shows a bad RNG algorithm. More samples are needed to reach a conclusion.
