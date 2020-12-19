@@ -68,10 +68,10 @@ optional arguments:
   --stdev {1,2,3}       Stdev for confidence limit, so 1 for 68%, 2 for 95%,
                         and 3 for 99.7%. Default=2
   --onlyme              Only count my hands
-  --holecards           Show wording for frequency of hole cards without suits
-  --holecardswithsuits  Show wording for frequency of hole cards with suits
+  --holecards           Show results for frequency of hole cards without suits
+  --holecardswithsuits  Show results for frequency of hole cards with suits
                         (Long output)
-  --allcombinations     Show wording for frequency of all combinations between
+  --allcombinations     Show results for frequency of all combinations between
                         hole and board cards.
 ```
 
