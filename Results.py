@@ -70,7 +70,7 @@ class Results:
         sample_size = sum(sample.values())
 
         # Print title and column headers
-        self._print_string_with_divider('\n')
+        self._print_string_with_divider('')
         if is_normal:
             confidence_limit = ['68', '95', '99.7'][std_dev-1]
             table_title = '{}, {}% Confidence Level, n={}'.format(title, confidence_limit, sample_size)
