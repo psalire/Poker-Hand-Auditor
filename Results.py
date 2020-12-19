@@ -3,7 +3,8 @@ from math import sqrt
 
 class Results:
 
-    def __init__(self, label_column_size=15, value_column_size=15, columns=6):
+    def __init__(self, label_column_size=15, value_column_size=15, columns=6, summary_only=False):
+        self._summary_only = summary_only
         self.set_label_column_size(label_column_size)
         self.set_value_column_size(value_column_size)
         self._set_full_width(6)
@@ -32,27 +33,30 @@ class Results:
         self._totals_row = self._label_column + self._float_value_column + self._value_column + self._float_value_column*(columns-3) + self._value_column
 
     # Printing rows
-    def _print_row(self, s, divider=False):
-        print(s)
-        if divider:
-            self._print_horizontal_divider()
-    def _print_results_row(self, *argv, divider=False):
-        self._print_row(self._results_row.format(*argv), divider)
-    def _print_halfwidth_value_span_row(self, *argv, divider=False):
-        self._print_row(self._halfwidth_value_span_row.format(*argv), divider)
-    def _print_fullwidth_value_span_row(self, *argv, divider=False):
-        self._print_row(self._value_span_fullwidth.format(*argv), divider)
+    def _print_row(self, s, divider=False, is_summary=False):
+        if not self._summary_only or self._summary_only and is_summary:
+            print(s)
+            if divider:
+                self._print_horizontal_divider(is_summary=is_summary)
+    def _print_results_row(self, *argv, divider=False, is_summary=False):
+        self._print_row(self._results_row.format(*argv), divider, is_summary)
+    def _print_halfwidth_value_span_row(self, *argv, divider=False, is_summary=False):
+        self._print_row(self._halfwidth_value_span_row.format(*argv), divider, is_summary)
+    def _print_fullwidth_value_span_row(self, *argv, divider=False, is_summary=False):
+        self._print_row(self._value_span_fullwidth.format(*argv), divider, is_summary)
     # Totals row used in calculate_and_print_results
-    def _print_totals_row(self, *argv, divider=False):
-        self._print_row(self._totals_row.format(*argv), divider)
+    def _print_totals_row(self, *argv, divider=False, is_summary=False):
+        self._print_row(self._totals_row.format(*argv), divider, is_summary)
 
     def _format_if_valid(self, format_str, val, append=''):
         return format_str.format(val) if val != None else str(val)+append
-    def _print_horizontal_divider(self):
-        print(self._horizontal_divider)
-    def _print_string_with_divider(self, s):
-        print(s)
-        self._print_horizontal_divider()
+    def _print_horizontal_divider(self, is_summary=False):
+        if not self._summary_only or self._summary_only and is_summary:
+            print(self._horizontal_divider)
+    def _print_string_with_divider(self, s, is_summary=False):
+        if not self._summary_only or self._summary_only and is_summary:
+            print(s)
+            self._print_horizontal_divider(is_summary=is_summary)
 
     # Print table of results
     ## title: str, title of the table
@@ -181,15 +185,16 @@ class Results:
     def print_summary(self, summary, test_results):
         self._set_full_width(4)
 
-        self._print_string_with_divider('')
-        self._print_fullwidth_value_span_row('SUMMARY', divider=True)
+        self._print_string_with_divider('', is_summary=True)
+        self._print_fullwidth_value_span_row('SUMMARY', divider=True, is_summary=True)
         for t,d in summary:
-            self._print_fullwidth_value_span_row(t, divider=True)
-            self._print_halfwidth_value_span_row('Test', 'Result', divider=True)
+            self._print_fullwidth_value_span_row(t, divider=True, is_summary=True)
+            self._print_halfwidth_value_span_row('Test', 'Result', divider=True, is_summary=True)
             for test, result in d:
-                self._print_halfwidth_value_span_row(test, result)
-            self._print_horizontal_divider()
+                self._print_halfwidth_value_span_row(test, result, is_summary=True)
+            self._print_horizontal_divider(is_summary=True)
         self._print_fullwidth_value_span_row(
             'Passing Tests: {}/{}'.format(test_results.count(True), len(test_results)),
             divider=True,
+            is_summary=True,
         )

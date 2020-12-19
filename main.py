@@ -52,14 +52,15 @@ def main():
     # Argparse
     argparser = argparse.ArgumentParser(description="This script takes a user's poker hand history and calculates proportions of card draws and hands compared to the expected values, their confidence intervals, and chi-square p-values to determine if the site's RNG is behaving as expected.")
     argparser.add_argument('path', type=str, help='Path to hand history directory')
-    argparser.add_argument('--allcombinations', action='store_true', help='Show table for frequency of all combinations between hole and board cards.')
+    argparser.add_argument('--site', choices=['Bovada'], default='Bovada', type=str,
+    help='Which site\'s hand history is being parsed. Default=Bovada')
+    argparser.add_argument('--summaryonly', action='store_true', help='Only output the summary.')
+    argparser.add_argument('--stdev', choices=[1,2,3], default=2, type=int,
+    help='Stdev for confidence limit, so 1 for 68%%, 2 for 95%%, and 3 for 99.7%%. Default=2')
     argparser.add_argument('--onlyme', action='store_true', help='Only count my hands')
     argparser.add_argument('--holecards', action='store_true', help='Show table for frequency of hole cards without suits')
     argparser.add_argument('--holecardswithsuits', action='store_true', help='Show table for frequency of hole cards with suits (Long output)')
-    argparser.add_argument('--stdev', choices=[1,2,3], default=2, type=int,
-                            help='Stdev for confidence limit, so 1 for 68%%, 2 for 95%%, and 3 for 99.7%%. Default=2')
-    argparser.add_argument('--site', choices=['Bovada'], default='Bovada', type=str,
-                            help='Which site\'s hand history is being parsed. Default=Bovada')
+    argparser.add_argument('--allcombinations', action='store_true', help='Show table for frequency of all combinations between hole and board cards.')
     args = argparser.parse_args()
 
     # Determine correct parser
@@ -126,7 +127,7 @@ def main():
     summary = [] # List of strs of result summaries
     test_results = [] # List of bool of pass/fail test results
 
-    results = Results()
+    results = Results(summary_only=args.summaryonly)
 
     # Print all results
     results.calculate_and_print_results(
