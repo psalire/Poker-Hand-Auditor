@@ -58,9 +58,9 @@ def main():
     argparser.add_argument('--stdev', choices=[1,2,3], default=2, type=int,
     help='Stdev for confidence limit, so 1 for 68%%, 2 for 95%%, and 3 for 99.7%%. Default=2')
     argparser.add_argument('--onlyme', action='store_true', help='Only count my hands')
-    argparser.add_argument('--holecards', action='store_true', help='Show wording for frequency of hole cards without suits')
-    argparser.add_argument('--holecardswithsuits', action='store_true', help='Show wording for frequency of hole cards with suits (Long output)')
-    argparser.add_argument('--allcombinations', action='store_true', help='Show wording for frequency of all combinations between hole and board cards.')
+    argparser.add_argument('--holecards', action='store_true', help='Show results for frequency of hole cards without suits')
+    argparser.add_argument('--holecardswithsuits', action='store_true', help='Show results for frequency of hole cards with suits (Long output)')
+    argparser.add_argument('--allcombinations', action='store_true', help='Show results for frequency of all combinations between hole and board cards.')
     args = argparser.parse_args()
 
     # Determine correct parser
