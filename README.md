@@ -76,6 +76,7 @@ optional arguments:
 ### Sample output
 
 ```
+> python main.py "C:\Users\psalire\Bovada.lv Poker\Hand History\012345678910" --stdev 3 --allcombinations --holecards
 
 ---------------------------------------------------------------------------------------------------------------
                             Distribution of Hands, 99.7% Confidence Level, n=44365                             |
