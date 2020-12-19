@@ -189,8 +189,7 @@ class Results:
             for test, result in d:
                 self._print_halfwidth_value_span_row(test, result)
             self._print_horizontal_divider()
-        passing_test_count = test_results.count(True)
         self._print_fullwidth_value_span_row(
-            'Passing Tests: {}/{} ({:.2f}%)'.format(passing_test_count, len(test_results), 100*passing_test_count/len(test_results)),
+            'Passing Tests: {}/{}'.format(test_results.count(True), len(test_results)),
             divider=True,
         )
