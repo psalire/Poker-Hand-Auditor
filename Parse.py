@@ -83,7 +83,7 @@ class Bovada:
         return cards
     # Returns next board cards as a list and moves cursor to location
     # Returns None if does not find summary header, e.g. no board cards seen or EOF
-    def get_summary_board(self):
+    def get_board_cards(self):
         # Find Summary header
         if not self._move_cursor_to_re(self.RE_STAGE['Summary']):
             return None

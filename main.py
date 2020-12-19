@@ -106,7 +106,7 @@ def main():
                     count_hole_cards_frequency([x[0] for x in (c_1,c_2)], hole_card_nosuits_frequency)
 
             # Get board cards
-            board = b.get_summary_board()
+            board = b.get_board_cards()
             if not board:
                 continue
 
