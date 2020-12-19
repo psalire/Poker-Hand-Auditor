@@ -334,7 +334,7 @@ straight flush |   0.000015    |       9       |   0.000017    |   -0.003712   |
 
 Above in the sample output looking at the first table showing the sampled hand distribution, it's clear that the distribution is very irregular. All hands except for four of a kind and straight flush fall significantly outside of the 99.7% confidence interval. In addition, the most common hand by far was a pair, not high card as is expected.
 
-Furthermore, even when taking all combinations of the hole and board cards in the second table, both high card and pair hands fall outside the 99.7% confidence interval.
+Furthermore, even when taking all combinations of the hole and board cards in the second table, both high card and pair hands fall outside the 99.7% confidence interval; the high card sample is lower than the lower confidence limit and the pair sample is higher than the upper confidence limit.
 
 Chi-squared tests also rejects conformity to the expected hand distributions (p < 0.05).
 
