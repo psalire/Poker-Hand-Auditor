@@ -32,6 +32,7 @@ Final output is tables of the sample proportions compared to the expected with u
 ```
 main.py  - Main script for output
 Parse.py - Parsing hand history files
+Results.py - Computing and printing results
 ```
 
 ## How to use
