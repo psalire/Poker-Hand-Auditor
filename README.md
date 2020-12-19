@@ -333,4 +333,6 @@ Above in the sample output looking at the second table showing all hand combinat
 
 However, when looking at the first table showing the actual hand distribution of the sample, it's clear that the distribution is very irregular. All hands except for four of a kind and straight fall significantly outside of the 99.7% confidence interval. In addition, the most common hand by far was a pair, not high card as is expected.
 
+Chi-squared tests also rejected conformity to the expected distribution (p > 0.05).
+
 This sample shows a bad RNG algorithm. More samples are needed to reach a conclusion.
