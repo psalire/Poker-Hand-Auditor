@@ -47,8 +47,9 @@ On Bovada, you have to manually download hand history for each game under the "A
 ### Usage
 
 ```
-usage: main.py [-h] [--allcombinations] [--onlyme] [--holecards]
-               [--holecardswithsuits] [--stdev {1,2,3}] [--site {Bovada}]
+usage: main.py [-h] [--site {Bovada}] [--summaryonly] [--stdev {1,2,3}]
+               [--onlyme] [--holecards] [--holecardswithsuits]
+               [--allcombinations]
                path
 
 This script takes a user's poker hand history and calculates proportions of
@@ -61,16 +62,17 @@ positional arguments:
 
 optional arguments:
   -h, --help            show this help message and exit
-  --allcombinations     Show table for frequency of all combinations between
-                        hole and board cards.
+  --site {Bovada}       Which site's hand history is being parsed.
+                        Default=Bovada
+  --summaryonly         Only output the summary.
+  --stdev {1,2,3}       Stdev for confidence limit, so 1 for 68%, 2 for 95%,
+                        and 3 for 99.7%. Default=2
   --onlyme              Only count my hands
   --holecards           Show table for frequency of hole cards without suits
   --holecardswithsuits  Show table for frequency of hole cards with suits
                         (Long output)
-  --stdev {1,2,3}       Stdev for confidence limit, so 1 for 68%, 2 for 95%,
-                        and 3 for 99.7%. Default=2
-  --site {Bovada}       Which site's hand history is being parsed.
-                        Default=Bovada
+  --allcombinations     Show table for frequency of all combinations between
+                        hole and board cards.
 ```
 
 ### Sample output
