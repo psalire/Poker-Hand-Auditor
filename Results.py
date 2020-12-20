@@ -48,8 +48,8 @@ class Results:
     def _print_totals_row(self, *argv, divider=False, is_summary=False):
         self._print_row(self._totals_row.format(*argv), divider, is_summary)
 
-    def _format_if_valid(self, format_str, val, append=''):
-        return format_str.format(val) if val != None else str(val)+append
+    def _format_if_valid(self, format_str, val, append_on_none=''):
+        return format_str.format(val) if val != None else str(val)+append_on_none
     def _print_horizontal_divider(self, is_summary=False):
         if not self._summary_only or self._summary_only and is_summary:
             print(self._horizontal_divider)
@@ -147,20 +147,34 @@ class Results:
 
         # Find and print chi-square and Kolmogorov-Smirnov values
         sample_values = list(sample.values())
-        if 0 not in expected_sizes:
-            chi_square, chi_square_pvalue = chisquare(sample_values, f_exp=expected_sizes)
-        else:
-            chi_square, chi_square_pvalue = None, None
+        # Remove expected sizes of 0
+        zero_in_expected_sizes = 0 in expected_sizes
+        if zero_in_expected_sizes:
+            for adjust, index in enumerate([i for i in range(len(expected_sizes)) if expected_sizes[i] == 0]):
+                del sample_values[index-adjust]
+                del expected_sizes[index-adjust]
+        chi_square, chi_square_pvalue = chisquare(sample_values, f_exp=expected_sizes)
 
-        self._print_fullwidth_value_span_row('Chi-Square Goodness of Fit Test Results', divider=True)
+        self._print_fullwidth_value_span_row(
+            'Chi-Square Goodness of Fit Test Results{}'.format(
+                ' (Excluding expected value(s)==0)' if zero_in_expected_sizes else ''
+            ),
+            divider=True
+        )
         self._print_halfwidth_value_span_row(
             'Chi-square',
-            self._format_if_valid(self._float_value_span_halfwidth, chi_square, append=' (Expected value(s)==0)'),
+            self._format_if_valid(
+                self._float_value_span_halfwidth,
+                chi_square
+            ),
             divider=False,
         )
         self._print_halfwidth_value_span_row(
             'Chi-square p-value',
-            self._format_if_valid(self._float_value_span_halfwidth, chi_square_pvalue, append=' (Expected value(s)==0)'),
+            self._format_if_valid(
+                self._float_value_span_halfwidth,
+                chi_square_pvalue
+            ),
             divider=True,
         )
 
