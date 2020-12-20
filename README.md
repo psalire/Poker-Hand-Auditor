@@ -339,6 +339,6 @@ Furthermore, even when taking all combinations of the hole and board cards in th
 
 Chi-squared tests also rejects conformity to the expected hand distributions (p < 0.05).
 
-The distribution of individual cards and hole cards however passed the chi-squared tests (p > 0.05), accepting conformity to the expected proportions.
+The distribution of individual cards and hole cards however passed the chi-squared tests (p > 0.05), failing to reject conformity to the expected proportions.
 
 Overall, this sample shows a bad RNG algorithm. More samples are needed to reach a conclusion.
