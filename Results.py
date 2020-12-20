@@ -150,8 +150,8 @@ class Results:
         # Find and print chi-square and Kolmogorov-Smirnov values
         sample_values = list(sample.values())
         ks, ks_pvalue = kstest(sample_values, expected_sizes)
-        chi_square, chi_square_pvalue = chisquare([100*s for s in sample_proportions], f_exp=[100*e for e in expected.values()])
-        
+        chi_square, chi_square_pvalue = chisquare(sample_values, f_exp=expected_sizes)
+
         self._print_fullwidth_value_span_row('Goodness of Fit Test Results', divider=True)
         self._print_halfwidth_value_span_row(
             'Chi-square',
