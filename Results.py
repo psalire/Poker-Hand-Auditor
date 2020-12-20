@@ -152,7 +152,7 @@ class Results:
         else:
             chi_square, chi_square_pvalue = None, None
 
-        self._print_fullwidth_value_span_row('Goodness of Fit Test Results', divider=True)
+        self._print_fullwidth_value_span_row('Chi-Square Goodness of Fit Test Results', divider=True)
         self._print_halfwidth_value_span_row(
             'Chi-square',
             self._format_if_valid(self._float_value_span_halfwidth, chi_square, append=' (Expected value(s)==0)'),
