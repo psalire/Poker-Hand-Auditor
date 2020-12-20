@@ -1,4 +1,4 @@
-from scipy.stats import chisquare
+from scipy.stats import chisquare, kstest
 from math import sqrt
 
 class Results:
@@ -89,10 +89,12 @@ class Results:
 
         totals = [0 for _ in range(columns)]
         expected_sizes = []
+        sample_proportions = []
 
         # Print column values
         for key in sample:
             sample_percentage = sample[key]/sample_size
+            sample_proportions.append(sample_percentage)
             expected_size = round(expected[key]*sample_size)
             expected_sizes.append(expected_size)
 
@@ -145,20 +147,30 @@ class Results:
         self._print_horizontal_divider()
         self._print_totals_row('Total', *(total for total in totals), divider=True)
 
-        # Find and print chi-square values
-        if 0 not in expected_sizes:
-            chi_square, chi_square_pvalue = chisquare(list(sample.values()), f_exp=expected_sizes)
-        else:
-            chi_square, chi_square_pvalue = None, None
-        self._print_fullwidth_value_span_row('Chi-Square Goodness of Fit Test Results', divider=True)
+        # Find and print chi-square and Kolmogorov-Smirnov values
+        sample_values = list(sample.values())
+        ks, ks_pvalue = kstest(sample_values, expected_sizes)
+        chi_square, chi_square_pvalue = chisquare([100*s for s in sample_proportions], f_exp=[100*e for e in expected.values()])
+        
+        self._print_fullwidth_value_span_row('Goodness of Fit Test Results', divider=True)
         self._print_halfwidth_value_span_row(
             'Chi-square',
-            self._format_if_valid(self._float_value_span_halfwidth, chi_square, ' (Expected value(s) == 0)'),
+            self._format_if_valid(self._float_value_span_halfwidth, chi_square),
             divider=False,
         )
         self._print_halfwidth_value_span_row(
-            'p-value',
-            self._format_if_valid(self._float_value_span_halfwidth, chi_square_pvalue, ' (Expected value(s) == 0)'),
+            'Chi-square p-value',
+            self._format_if_valid(self._float_value_span_halfwidth, chi_square_pvalue),
+            divider=True,
+        )
+        self._print_halfwidth_value_span_row(
+            'Kolmogorov-Smirnov',
+            self._format_if_valid(self._float_value_span_halfwidth, ks),
+            divider=False,
+        )
+        self._print_halfwidth_value_span_row(
+            'Kolmogorov-Smirnov p-value',
+            self._format_if_valid(self._float_value_span_halfwidth, ks_pvalue),
             divider=True,
         )
 
@@ -178,6 +190,11 @@ class Results:
                 'Chi-square p-value > 0.05',
                 'PASS' if test_results[-1] else 'FAIL',
             ))
+        test_results.append(ks_pvalue > 0.05)
+        summary[-1][1].append((
+            'Kolmogorov-Smirnov p-value > 0.05',
+            'PASS' if test_results[-1] else 'FAIL',
+        ))
 
     # Print summary
     ## summary: list of pair of strs
