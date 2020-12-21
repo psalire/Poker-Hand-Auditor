@@ -213,7 +213,13 @@ def main():
         test_results,
         std_dev=args.stdev,
     )
-    results.print_kstest_table(chisquare_pvalues, column_size=40)
+    results.print_kstest_table(
+        chisquare_pvalues,
+        'Chi-square p-values of binned Distribution of Hands',
+        summary,
+        test_results,
+        column_size=40
+    )
     if args.allcombinations:
         results.calculate_and_print_results(
             'Distribution of Hands, All Combinations',
@@ -224,7 +230,13 @@ def main():
             test_results,
             std_dev=args.stdev,
         )
-        results.print_kstest_table(chisquare_allcombinations_pvalues, column_size=40)
+        results.print_kstest_table(
+            chisquare_allcombinations_pvalues,
+            'Chi-square p-values of binned Distribution of Hands, All Combinations',
+            summary,
+            test_results,
+            column_size=40
+        )
     results.calculate_and_print_results(
         'Distribution of Cards',
         'Card',

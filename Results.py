@@ -206,7 +206,8 @@ class Results:
             self._summary_only = prev_summary_only_val
 
     # Print kstest table
-    def print_kstest_table(self, chi_square_pvalues, column_size=30):
+    def print_kstest_table(self, chi_square_pvalues, title, summary=None,
+                           test_results=None, column_size=30):
         initial_sizes = (self._label_column_size, self._value_column_size, self._full_width)
         sample_size = sum([x[0] for x in chi_square_pvalues])
         self.set_label_column_size(column_size)
@@ -215,7 +216,7 @@ class Results:
 
         self.print_horizontal_divider()
         self.print_fullwidth_value_span_row(
-            f'Chi-square p-values of binned Distribution of Hands, n={sample_size}',
+            f'{title}, n={sample_size}',
             divider=True
         )
         self.print_halfwidth_value_span_row('Bin', 'p-value', divider=True)
@@ -223,7 +224,7 @@ class Results:
             self.print_halfwidth_float_span_row(str(i), t[1], divider=False)
         self.print_horizontal_divider()
 
-        self.print_fullwidth_value_span_row('Kolmogorov-Smirnov uniformity test of p-values', divider=True)
+        self.print_fullwidth_value_span_row('Kolmogorov-Smirnov uniformity test of Chi-square p-values', divider=True)
         ks, ks_pvalue = kstest([p[1] for p in chi_square_pvalues], 'uniform')
         self.print_halfwidth_float_span_row('KS', ks, divider=False)
         self.print_halfwidth_float_span_row('p-value', ks_pvalue, divider=True)
@@ -231,6 +232,15 @@ class Results:
         self.set_label_column_size(initial_sizes[0])
         self.set_value_column_size(initial_sizes[1])
         self.set_full_width(initial_sizes[2])
+
+        # Add to last summary test results
+        if summary != None and test_results != None:
+            # Assume
+            test_results.append(ks_pvalue > 0.05)
+            summary[-1][1].append((
+                'KS uniformity p-value > 0.05',
+                'PASS' if test_results[-1] else 'FAIL',
+            ))
 
     # Print summary
     ## summary: list of pair of strs
