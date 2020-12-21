@@ -216,7 +216,7 @@ class Results:
 
         self.print_horizontal_divider()
         self.print_fullwidth_value_span_row(
-            f'{title}, n={sample_size}',
+            f'{title}, n={sample_size}, bins={len(chi_square_pvalues)}',
             divider=True
         )
         self.print_halfwidth_value_span_row('Bin', 'p-value', divider=True)
