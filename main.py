@@ -73,6 +73,7 @@ def main():
         help='Stdev for confidence limit, so 1 for 68%%, 2 for 95%%, and 3 for 99.7%%. Default=2')
     argparser.add_argument('--bins', default=10, type=int,
         help='Number of bins for p-value uniformity test (Kolmogorov-Smirnov test on Chi-square p-values). Default=10')
+    argparser.add_argument('--showallbinnedtables', action='store_true', help='Show tables for all bins.')
     argparser.add_argument('--onlyme', action='store_true', help='Only count my hands')
     argparser.add_argument('--holecards', action='store_true', help='Show results for frequency of hole cards without suits')
     argparser.add_argument('--holecardswithsuits', action='store_true', help='Show results for frequency of hole cards with suits (Long output)')
@@ -111,7 +112,6 @@ def main():
             hole_cards = b.get_hole_cards(only_me=args.onlyme)
             if not hole_cards:
                 break # EOF
-            all_hole_cards.append(hole_cards)
 
             # Count card frequency of hole cards
             for c_1, c_2 in hole_cards:
@@ -128,7 +128,6 @@ def main():
             board = b.get_board_cards()
             if not board:
                 continue
-            all_board_cards.append(board)
 
             # Count frequency of individual board cards
             for c in board:
@@ -141,25 +140,72 @@ def main():
                 board,
                 hand_frequency,
                 allcombinations=args.allcombinations,
-                allcombinations_hand_frequency=hand_allcombinations_frequency
+                allcombinations_hand_frequency=None if not args.allcombinations else hand_allcombinations_frequency
             )
-            # for player_hole_cards in hole_cards:
-            #     # Hand frequency of hole cards with board
-            #     count_hand_frequency(player_hole_cards, board, evaluator, hand_frequency)
-            #
-            #     # Hand frequency of all combinations of hole cards with board
-            #     if args.allcombinations:
-            #         for hand in combinations(list(player_hole_cards)+board, 5):
-            #             count_hand_frequency(hand[:2], hand[2:], evaluator, hand_allcombinations_frequency)
 
+            # Track all hole_card with board results
+            all_hole_cards.append(hole_cards)
+            all_board_cards.append(board)
+
+    assert len(all_hole_cards)==len(all_board_cards) # Sanity check on lengths
+
+    results = Results(summary_only=args.summaryonly)
     summary = [] # List of strs of result summaries
     test_results = [] # List of bool of pass/fail test results
 
-    results = Results(summary_only=args.summaryonly)
+    # P-value uniformity test of chisquare pvalues based with args.bins bins
+    all_length = len(all_hole_cards)
+    interval = len(all_hole_cards) // args.bins
+    binned_frequencies = [
+        {x: 0 for x in hand_probabilites.keys()} for _ in range(args.bins)
+    ]
+    if args.allcombinations:
+        binned_all_frequencies = [
+            {x: 0 for x in hand_probabilites.keys()} for _ in range(args.bins)
+        ]
+    chisquare_pvalues = []
+    if args.allcombinations:
+        chisquare_allcombinations_pvalues = []
+    for x, i in enumerate(range(0, all_length, interval)):
+        end_i = i + interval
+        last = all_length - end_i < interval
+        if last:
+            end_i = all_length
+        # Count binned hand frequencies
+        for bin_hole_cards, bin_board_cards in zip(all_hole_cards[i:end_i], all_board_cards[i:end_i]):
+            count_hand_frequencies(
+                evaluator,
+                bin_hole_cards,
+                bin_board_cards,
+                binned_frequencies[x],
+                allcombinations=args.allcombinations,
+                allcombinations_hand_frequency=None if not args.allcombinations else binned_all_frequencies[x]
+            )
+        results.calculate_and_print_results(
+            'BIN #{} Distribution of Hands'.format(x),
+            'Hand',
+            hand_probabilites,
+            binned_frequencies[x],
+            pvalues=chisquare_pvalues,
+            std_dev=args.stdev,
+            no_output=not args.showallbinnedtables,
+        )
+        if args.allcombinations:
+            results.calculate_and_print_results(
+                'BIN #{} Distribution of All Hand Combinations'.format(x),
+                'Hand',
+                hand_probabilites,
+                binned_all_frequencies[x],
+                pvalues=chisquare_allcombinations_pvalues,
+                std_dev=args.stdev,
+                no_output=not args.showallbinnedtables,
+            )
+        if last:
+            break
 
     # Print all results
     results.calculate_and_print_results(
-        'Distribution of Hands',
+        'Distribution of All Hands',
         'Hand',
         hand_probabilites,
         hand_frequency,
@@ -167,9 +213,10 @@ def main():
         test_results,
         std_dev=args.stdev,
     )
+    results.print_kstest_table(chisquare_pvalues, column_size=40)
     if args.allcombinations:
         results.calculate_and_print_results(
-            'Distribution of All Hand Combinations',
+            'Distribution of Hands, All Combinations',
             'Hand',
             hand_probabilites,
             hand_allcombinations_frequency,
@@ -177,6 +224,7 @@ def main():
             test_results,
             std_dev=args.stdev,
         )
+        results.print_kstest_table(chisquare_allcombinations_pvalues, column_size=40)
     results.calculate_and_print_results(
         'Distribution of Cards',
         'Card',

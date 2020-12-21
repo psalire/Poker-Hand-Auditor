@@ -1,13 +1,14 @@
-from scipy.stats import chisquare
+from scipy.stats import chisquare, kstest
 from math import sqrt
 
 class Results:
+    DEFAULT_COLUMN_SIZE=15
 
-    def __init__(self, label_column_size=15, value_column_size=15, columns=6, summary_only=False):
+    def __init__(self, label_column_size=DEFAULT_COLUMN_SIZE, value_column_size=DEFAULT_COLUMN_SIZE, columns=6, summary_only=False):
         self._summary_only = summary_only
         self.set_label_column_size(label_column_size)
         self.set_value_column_size(value_column_size)
-        self._set_full_width(6)
+        self.set_full_width(6)
 
     # Set sizes and formatting values based on size
     def set_label_column_size(self, size):
@@ -19,7 +20,7 @@ class Results:
         self._value_column = '{:^%d}|' % self._value_column_size
         self._float_value_column = '{:^%df}|' % self._value_column_size
         self._float_value = '{:^%df}' % self._value_column_size
-    def _set_full_width(self, columns):
+    def set_full_width(self, columns):
         # Various column formats
         self._full_width = self._label_column_size + self._value_column_size*columns + columns
         self._horizontal_divider = ('{:-^%d}' % self._full_width).format('')
@@ -37,26 +38,35 @@ class Results:
         if not self._summary_only or self._summary_only and is_summary:
             print(s)
             if divider:
-                self._print_horizontal_divider(is_summary=is_summary)
-    def _print_results_row(self, *argv, divider=False, is_summary=False):
+                self.print_horizontal_divider(is_summary=is_summary)
+    def print_results_row(self, *argv, divider=False, is_summary=False):
         self._print_row(self._results_row.format(*argv), divider, is_summary)
-    def _print_halfwidth_value_span_row(self, *argv, divider=False, is_summary=False):
+    def print_halfwidth_value_span_row(self, *argv, divider=False, is_summary=False):
         self._print_row(self._halfwidth_value_span_row.format(*argv), divider, is_summary)
-    def _print_fullwidth_value_span_row(self, *argv, divider=False, is_summary=False):
+    def print_halfwidth_float_span_row(self, label, *argv, divider=False, is_summary=False):
+        self.print_halfwidth_value_span_row(
+            label,
+            self._format_if_valid(
+                self._float_value_span_halfwidth,
+                *argv
+            ),
+            divider=divider,
+        )
+    def print_fullwidth_value_span_row(self, *argv, divider=False, is_summary=False):
         self._print_row(self._value_span_fullwidth.format(*argv), divider, is_summary)
     # Totals row used in calculate_and_print_results
-    def _print_totals_row(self, *argv, divider=False, is_summary=False):
+    def print_totals_row(self, *argv, divider=False, is_summary=False):
         self._print_row(self._totals_row.format(*argv), divider, is_summary)
 
     def _format_if_valid(self, format_str, val, append_on_none=''):
         return format_str.format(val) if val != None else str(val)+append_on_none
-    def _print_horizontal_divider(self, is_summary=False):
+    def print_horizontal_divider(self, is_summary=False):
         if not self._summary_only or self._summary_only and is_summary:
             print(self._horizontal_divider)
-    def _print_string_with_divider(self, s, is_summary=False):
+    def print_string_with_divider(self, s, is_summary=False):
         if not self._summary_only or self._summary_only and is_summary:
             print(s)
-            self._print_horizontal_divider(is_summary=is_summary)
+            self.print_horizontal_divider(is_summary=is_summary)
 
     # Print table of results
     ## title: str, title of the table
@@ -67,14 +77,21 @@ class Results:
     ## label_column_size: int, width of first column
     ## value_column_size: int, width of other columns
     ## is_normal: bool, is normally distributed, whether to calculate confidence intervals
-    def calculate_and_print_results(self, title, label, expected, sample, summary, test_results, std_dev=2, is_normal=True):
+    ## Returns float, chi_square_pvalue
+    def calculate_and_print_results(self, title, label, expected, sample, summary=None,
+                                    test_results=None, std_dev=2, is_normal=True, pvalues=None,
+                                    no_output=False):
+        if no_output:
+            prev_summary_only_val = self._summary_only
+            self._summary_only = True
+
         columns = 6 if is_normal else 4
-        self._set_full_width(columns)
+        self.set_full_width(columns)
 
         sample_size = sum(sample.values())
 
         # Print title and column headers
-        self._print_string_with_divider('')
+        self.print_string_with_divider('')
         if is_normal:
             confidence_limit = ['68', '95', '99.7'][std_dev-1]
             table_title = '{}, {}% Confidence Level, n={}'.format(title, confidence_limit, sample_size)
@@ -84,8 +101,8 @@ class Results:
         else:
             table_title = '{}, n={}'.format(title, sample_size)
             column_name_args = (label, 'Expected', 'Expected Size','Sample', 'Sample Size')
-        self._print_fullwidth_value_span_row(table_title, divider=True)
-        self._print_results_row(*column_name_args, divider=True)
+        self.print_fullwidth_value_span_row(table_title, divider=True)
+        self.print_results_row(*column_name_args, divider=True)
 
         totals = [0 for _ in range(columns)]
         expected_sizes = []
@@ -110,7 +127,7 @@ class Results:
                     lower_percentage = None
                     upper_percentage = None
 
-                self._print_results_row(
+                self.print_results_row(
                     key, # Label
                     self._format_if_valid(self._float_value, expected[key]), # Expected proportion
                     expected_size, # Expected size
@@ -120,7 +137,7 @@ class Results:
                     sample[key], # Sample size
                 )
             else:
-                self._print_results_row(
+                self.print_results_row(
                     key, # Label
                     self._format_if_valid(self._float_value, expected[key]), # Expected proportion
                     expected_size, # Expected size
@@ -142,8 +159,8 @@ class Results:
                 totals[1] += expected_size
                 totals[2] += sample_percentage
                 totals[3] += sample[key]
-        self._print_horizontal_divider()
-        self._print_totals_row('Total', *(total for total in totals), divider=True)
+        self.print_horizontal_divider()
+        self.print_totals_row('Total', *(total for total in totals), divider=True)
 
         # Find and print chi-square and Kolmogorov-Smirnov values
         sample_values = list(sample.values())
@@ -155,61 +172,81 @@ class Results:
                 del expected_sizes[index-adjust]
         chi_square, chi_square_pvalue = chisquare(sample_values, f_exp=expected_sizes)
 
-        self._print_fullwidth_value_span_row(
-            'Chi-Square Goodness of Fit Test Results{}'.format(
+        self.print_fullwidth_value_span_row(
+            'Chi-Square Goodness of Fit Test{}'.format(
                 ' (Excluding expected value(s)==0)' if zero_in_expected_sizes else ''
             ),
             divider=True
         )
-        self._print_halfwidth_value_span_row(
-            'Chi-square',
-            self._format_if_valid(
-                self._float_value_span_halfwidth,
-                chi_square
-            ),
-            divider=False,
-        )
-        self._print_halfwidth_value_span_row(
-            'Chi-square p-value',
-            self._format_if_valid(
-                self._float_value_span_halfwidth,
-                chi_square_pvalue
-            ),
-            divider=True,
-        )
+        self.print_halfwidth_float_span_row('Chi-square', chi_square, divider=False)
+        self.print_halfwidth_float_span_row('Chi-square p-value', chi_square_pvalue, divider=True)
 
         assert sample_size == totals[5 if is_normal else 3] # Sanity check for sample size
 
         # Write summary of results
-        summary.append(('{}, n={}'.format(title, sample_size), []))
-        if is_normal:
-            test_results.append(all([l < s < u for s,l,u in proportions]))
-            summary[-1][1].append((
-                'Sample in {}% confidence interval'.format(confidence_limit),
-                'PASS' if test_results[-1] else 'FAIL',
-            ))
-        if chi_square_pvalue != None:
-            test_results.append(chi_square_pvalue > 0.05)
-            summary[-1][1].append((
-                'Chi-square p-value > 0.05',
-                'PASS' if test_results[-1] else 'FAIL',
-            ))
+        if summary != None and test_results != None:
+            summary.append(('{}, n={}'.format(title, sample_size), []))
+            if is_normal:
+                test_results.append(all([l < s < u for s,l,u in proportions]))
+                summary[-1][1].append((
+                    'Sample in {}% confidence interval'.format(confidence_limit),
+                    'PASS' if test_results[-1] else 'FAIL',
+                ))
+            if chi_square_pvalue != None:
+                test_results.append(chi_square_pvalue > 0.05)
+                summary[-1][1].append((
+                    'Chi-square p-value > 0.05',
+                    'PASS' if test_results[-1] else 'FAIL',
+                ))
+
+        if pvalues != None:
+            pvalues.append((sample_size, chi_square_pvalue))
+
+        if no_output:
+            self._summary_only = prev_summary_only_val
+
+    # Print kstest table
+    def print_kstest_table(self, chi_square_pvalues, column_size=30):
+        initial_sizes = (self._label_column_size, self._value_column_size, self._full_width)
+        sample_size = sum([x[0] for x in chi_square_pvalues])
+        self.set_label_column_size(column_size)
+        self.set_value_column_size(column_size)
+        self.set_full_width(1)
+
+        self.print_horizontal_divider()
+        self.print_fullwidth_value_span_row(
+            f'Chi-square p-values of binned Distribution of Hands, n={sample_size}',
+            divider=True
+        )
+        self.print_halfwidth_value_span_row('Bin', 'p-value', divider=True)
+        for i, t in enumerate(chi_square_pvalues):
+            self.print_halfwidth_float_span_row(str(i), t[1], divider=False)
+        self.print_horizontal_divider()
+
+        self.print_fullwidth_value_span_row('Kolmogorov-Smirnov uniformity test of p-values', divider=True)
+        ks, ks_pvalue = kstest([p[1] for p in chi_square_pvalues], 'uniform')
+        self.print_halfwidth_float_span_row('KS', ks, divider=False)
+        self.print_halfwidth_float_span_row('p-value', ks_pvalue, divider=True)
+
+        self.set_label_column_size(initial_sizes[0])
+        self.set_value_column_size(initial_sizes[1])
+        self.set_full_width(initial_sizes[2])
 
     # Print summary
     ## summary: list of pair of strs
     ## test_results: list of bool
     def print_summary(self, summary, test_results):
-        self._set_full_width(4)
+        self.set_full_width(4)
 
-        self._print_string_with_divider('', is_summary=True)
-        self._print_fullwidth_value_span_row('SUMMARY', divider=True, is_summary=True)
+        self.print_string_with_divider('', is_summary=True)
+        self.print_fullwidth_value_span_row('SUMMARY', divider=True, is_summary=True)
         for title,details in summary:
-            self._print_fullwidth_value_span_row(title, divider=True, is_summary=True)
-            self._print_halfwidth_value_span_row('Test', 'Result', divider=True, is_summary=True)
+            self.print_fullwidth_value_span_row(title, divider=True, is_summary=True)
+            self.print_halfwidth_value_span_row('Test', 'Result', divider=True, is_summary=True)
             for test, result in details:
-                self._print_halfwidth_value_span_row(test, result, is_summary=True)
-            self._print_horizontal_divider(is_summary=True)
-        self._print_fullwidth_value_span_row(
+                self.print_halfwidth_value_span_row(test, result, is_summary=True)
+            self.print_horizontal_divider(is_summary=True)
+        self.print_fullwidth_value_span_row(
             'Passing Tests: {}/{}'.format(test_results.count(True), len(test_results)),
             divider=True,
             is_summary=True,
