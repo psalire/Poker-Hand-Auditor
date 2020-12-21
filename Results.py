@@ -203,10 +203,10 @@ class Results:
 
         self._print_string_with_divider('', is_summary=True)
         self._print_fullwidth_value_span_row('SUMMARY', divider=True, is_summary=True)
-        for t,d in summary:
-            self._print_fullwidth_value_span_row(t, divider=True, is_summary=True)
+        for title,details in summary:
+            self._print_fullwidth_value_span_row(title, divider=True, is_summary=True)
             self._print_halfwidth_value_span_row('Test', 'Result', divider=True, is_summary=True)
-            for test, result in d:
+            for test, result in details:
                 self._print_halfwidth_value_span_row(test, result, is_summary=True)
             self._print_horizontal_divider(is_summary=True)
         self._print_fullwidth_value_span_row(
