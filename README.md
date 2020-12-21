@@ -1,7 +1,7 @@
 
 # Poker Hand Auditor
 
-This script takes a user's poker hand history and calculates proportions of card draws and hands compared to the expected values, their confidence intervals, and chi-square p-values to determine if the site's RNG is behaving as expected. These are some of the same methods as shown in iTechlabs' [example audit report](https://itechlabs.com/certification-services/rtprng-audits/), who are one of the leaders in RNG audits for casinos.
+This script takes a user's poker hand history and calculates proportions of card draws and hands compared to the expected values, their confidence intervals, and chi-square p-values to determine if the site's RNG is behaving as expected. These are some of the same methods as shown in iTechlabs' [example audit report](https://itechlabs.com/certification-services/rtprng-audits/), who are one of the leaders in RNG audits for casinos. See iTechlabs' [audits for Partypoker](https://www.partypoker.com/en/s/systemfairness) for an actual audit report.
 
 iTechlabs also uses Marsaglia's "diehard" tests which are not covered in this script but worth looking into.
 
@@ -49,8 +49,8 @@ On Bovada, you have to manually download hand history for each game under the "A
 
 ```
 usage: main.py [-h] [--site {Bovada}] [--summaryonly] [--stdev {1,2,3}]
-               [--onlyme] [--holecards] [--holecardswithsuits]
-               [--allcombinations]
+               [--bins BINS] [--showallbinnedtables] [--onlyme] [--holecards]
+               [--holecardswithsuits] [--allcombinations]
                path
 
 This script takes a user's poker hand history and calculates proportions of
@@ -68,6 +68,11 @@ optional arguments:
   --summaryonly         Show summary only, no tables.
   --stdev {1,2,3}       Stdev for confidence limit, so 1 for 68%, 2 for 95%,
                         and 3 for 99.7%. Default=2
+  --bins BINS           Number of bins for p-value uniformity test
+                        (Kolmogorov-Smirnov test on Chi-square p-values).
+                        Default=10
+  --showallbinnedtables
+                        Show tables for all bins.
   --onlyme              Only count my hands
   --holecards           Show results for frequency of hole cards without suits
   --holecardswithsuits  Show results for frequency of hole cards with suits
@@ -82,7 +87,7 @@ optional arguments:
 > python main.py "C:\Users\psalire\Bovada.lv Poker\Hand History\012345678910" --stdev 3 --allcombinations --holecards
 
 ---------------------------------------------------------------------------------------------------------------
-                            Distribution of Hands, 99.7% Confidence Level, n=45276                             |
+                          Distribution of All Hands, 99.7% Confidence Level, n=45276                           |
 ---------------------------------------------------------------------------------------------------------------
      Hand      |   Expected    | Expected Size |    Sample     |     Lower     |     Upper     |  Sample Size  |
 ---------------------------------------------------------------------------------------------------------------
@@ -98,14 +103,35 @@ straight flush |   0.000015    |       1       |   0.000199    |   -0.003914   |
 ---------------------------------------------------------------------------------------------------------------
      Total     |   0.999999    |     45276     |   1.000000    |   0.935013    |   1.064986    |     45276     |
 ---------------------------------------------------------------------------------------------------------------
-                                    Chi-Square Goodness of Fit Test Results                                    |
+                                        Chi-Square Goodness of Fit Test                                        |
 ---------------------------------------------------------------------------------------------------------------
                       Chi-square                       |                     41881.872777                      |
-                        p-value                        |                       0.000000                        |
+                  Chi-square p-value                   |                       0.000000                        |
 ---------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+          Chi-square p-values of binned Distribution of Hands, n=45276           |
+---------------------------------------------------------------------------------
+                  Bin                   |                p-value                 |
+---------------------------------------------------------------------------------
+                   0                    |                0.000000                |
+                   1                    |                0.000000                |
+                   2                    |                0.000000                |
+                   3                    |                0.000000                |
+                   4                    |                0.000000                |
+                   5                    |                0.000000                |
+                   6                    |                0.000000                |
+                   7                    |                0.000000                |
+                   8                    |                0.000000                |
+                   9                    |                0.000000                |
+---------------------------------------------------------------------------------
+            Kolmogorov-Smirnov uniformity test of Chi-square p-values            |
+---------------------------------------------------------------------------------
+                   KS                   |                1.000000                |
+                p-value                 |                0.000000                |
+---------------------------------------------------------------------------------
 
 ---------------------------------------------------------------------------------------------------------------
-                    Distribution of All Hand Combinations, 99.7% Confidence Level, n=590856                    |
+                   Distribution of Hands, All Combinations, 99.7% Confidence Level, n=590856                   |
 ---------------------------------------------------------------------------------------------------------------
      Hand      |   Expected    | Expected Size |    Sample     |     Lower     |     Upper     |  Sample Size  |
 ---------------------------------------------------------------------------------------------------------------
@@ -121,11 +147,32 @@ straight flush |   0.000015    |       9       |   0.000017    |   -0.003712   |
 ---------------------------------------------------------------------------------------------------------------
      Total     |   0.999999    |    590855     |   1.000000    |   0.967945    |   1.032054    |    590856     |
 ---------------------------------------------------------------------------------------------------------------
-                                    Chi-Square Goodness of Fit Test Results                                    |
+                                        Chi-Square Goodness of Fit Test                                        |
 ---------------------------------------------------------------------------------------------------------------
                       Chi-square                       |                      128.405743                       |
-                        p-value                        |                       0.000000                        |
+                  Chi-square p-value                   |                       0.000000                        |
 ---------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+ Chi-square p-values of binned Distribution of Hands, All Combinations, n=590856 |
+---------------------------------------------------------------------------------
+                  Bin                   |                p-value                 |
+---------------------------------------------------------------------------------
+                   0                    |                0.000000                |
+                   1                    |                0.000204                |
+                   2                    |                0.008364                |
+                   3                    |                0.000000                |
+                   4                    |                0.000000                |
+                   5                    |                0.003877                |
+                   6                    |                0.004752                |
+                   7                    |                0.000000                |
+                   8                    |                0.002906                |
+                   9                    |                0.000000                |
+---------------------------------------------------------------------------------
+            Kolmogorov-Smirnov uniformity test of Chi-square p-values            |
+---------------------------------------------------------------------------------
+                   KS                   |                0.991636                |
+                p-value                 |                0.000000                |
+---------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
                         Distribution of Cards, n=160377                        |
@@ -187,10 +234,10 @@ straight flush |   0.000015    |       9       |   0.000017    |   -0.003712   |
 -------------------------------------------------------------------------------
      Total     |   1.000000    |    160368     |   1.000000    |    160377     |
 -------------------------------------------------------------------------------
-                    Chi-Square Goodness of Fit Test Results                    |
+                        Chi-Square Goodness of Fit Test                        |
 -------------------------------------------------------------------------------
               Chi-square               |               32.552205               |
-                p-value                |               0.979386                |
+          Chi-square p-value           |               0.979386                |
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
@@ -292,28 +339,30 @@ straight flush |   0.000015    |       9       |   0.000017    |   -0.003712   |
 -------------------------------------------------------------------------------
      Total     |   1.000000    |     66547     |   1.000000    |     66524     |
 -------------------------------------------------------------------------------
-                    Chi-Square Goodness of Fit Test Results                    |
+                        Chi-Square Goodness of Fit Test                        |
 -------------------------------------------------------------------------------
               Chi-square               |               70.839001               |
-                p-value                |               0.932371                |
+          Chi-square p-value           |               0.932371                |
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
                                     SUMMARY                                    |
 -------------------------------------------------------------------------------
-                        Distribution of Hands, n=45276                         |
+                      Distribution of All Hands, n=45276                       |
 -------------------------------------------------------------------------------
                  Test                  |                Result                 |
 -------------------------------------------------------------------------------
   Sample in 99.7% confidence interval  |                 FAIL                  |
        Chi-square p-value > 0.05       |                 FAIL                  |
+     KS uniformity p-value > 0.05      |                 FAIL                  |
 -------------------------------------------------------------------------------
-                Distribution of All Hand Combinations, n=590856                |
+               Distribution of Hands, All Combinations, n=590856               |
 -------------------------------------------------------------------------------
                  Test                  |                Result                 |
 -------------------------------------------------------------------------------
   Sample in 99.7% confidence interval  |                 FAIL                  |
        Chi-square p-value > 0.05       |                 FAIL                  |
+     KS uniformity p-value > 0.05      |                 FAIL                  |
 -------------------------------------------------------------------------------
                         Distribution of Cards, n=160377                        |
 -------------------------------------------------------------------------------
@@ -327,7 +376,7 @@ straight flush |   0.000015    |       9       |   0.000017    |   -0.003712   |
 -------------------------------------------------------------------------------
        Chi-square p-value > 0.05       |                 PASS                  |
 -------------------------------------------------------------------------------
-                              Passing Tests: 2/6                               |
+                              Passing Tests: 2/8                               |
 -------------------------------------------------------------------------------
 ```
 
@@ -335,10 +384,12 @@ straight flush |   0.000015    |       9       |   0.000017    |   -0.003712   |
 
 Above in the sample output looking at the first table showing the sampled hand distribution, it's clear that the distribution is very irregular. All hands except for four of a kind and straight flush fall significantly outside of the 99.7% confidence interval. In addition, the most common hand by far was a pair, not high card as is expected.
 
-Furthermore, even when taking all combinations of the hole and board cards in the second table, both high card and pair hands fall outside the 99.7% confidence interval; the high card sample is lower than the lower confidence limit and the pair sample is higher than the upper confidence limit.
+Furthermore, even when taking all combinations of the hole and board cards in the third table, both high card and pair hands fall outside the 99.7% confidence interval; the high card sample is lower than the lower confidence limit and the pair sample is higher than the upper confidence limit.
 
-Chi-squared tests also rejects conformity to the expected hand distributions (p < 0.05).
+Chi-square tests also rejects conformity to the expected hand distributions (p < 0.05).
 
 The distribution of individual cards and hole cards however passed the chi-squared tests (p > 0.05), failing to reject conformity to the expected proportions.
+
+The Kolmogorov-Smirnov tests are not really relevant here as almost all p-values of the chi-square values came out to be 0.0.
 
 Overall, this sample shows a bad RNG algorithm. More samples are needed to reach a conclusion.
