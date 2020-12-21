@@ -1,7 +1,7 @@
 
 # Poker Hand Auditor
 
-This script takes a user's poker hand history and calculates proportions of card draws and hands compared to the expected values, their confidence intervals, and chi-square p-values to determine if the site's RNG is behaving as expected. These are some of the same methods as shown in iTechlabs' [example audit report](https://itechlabs.com/certification-services/rtprng-audits/), who are one of the leaders in RNG audits for casinos. See iTechlabs' [audits for Partypoker](https://www.partypoker.com/en/s/systemfairness) for an actual audit report.
+This script takes a user's poker hand history and calculates proportions of card draws and hands compared to the expected values, their confidence intervals, and chi-square p-values to determine if the site's RNG is behaving as expected. These are some of the same methods as shown in iTechlabs' [example audit report](https://itechlabs.com/certification-services/rtprng-audits/), who are one of the leaders in RNG audits for casinos. See iTechlabs' [audits for Partypoker](https://www.partypoker.com/en/s/systemfairness) for actual audit reports.
 
 iTechlabs also uses Marsaglia's "diehard" tests which are not covered in this script but worth looking into.
 
