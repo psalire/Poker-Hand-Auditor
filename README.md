@@ -84,7 +84,7 @@ optional arguments:
 ### Sample output
 
 ```
-> python main.py "C:\Users\psalire\Bovada.lv Poker\Hand History\012345678910" --stdev 3 --allcombinations --holecards
+> python main.py "C:\Users\psalire\Bovada.lv Poker\Hand History\012345678910" --stdev 3 --allcombinations --holecards --bins 10
 
 ---------------------------------------------------------------------------------------------------------------
                           Distribution of All Hands, 99.7% Confidence Level, n=45276                           |
@@ -109,7 +109,7 @@ straight flush |   0.000015    |       1       |   0.000199    |   -0.003914   |
                   Chi-square p-value                   |                       0.000000                        |
 ---------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
-          Chi-square p-values of binned Distribution of Hands, n=45276           |
+      Chi-square p-values of binned Distribution of Hands, n=45276, bins=10      |
 ---------------------------------------------------------------------------------
                   Bin                   |                p-value                 |
 ---------------------------------------------------------------------------------
@@ -153,7 +153,7 @@ straight flush |   0.000015    |       9       |   0.000017    |   -0.003712   |
                   Chi-square p-value                   |                       0.000000                        |
 ---------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
- Chi-square p-values of binned Distribution of Hands, All Combinations, n=590856 |
+Chi-square p-values of binned Distribution of Hands, All Combinations, n=590856, bins=10|
 ---------------------------------------------------------------------------------
                   Bin                   |                p-value                 |
 ---------------------------------------------------------------------------------
